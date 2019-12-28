@@ -12,8 +12,11 @@
 #include <stdio.h>
 #include <iostream>
 #include <sys/time.h>                // for gettimeofday()
-
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 #include <ctime>
+using namespace cv;
+
 using namespace std;
 
 #ifdef __APPLE__
@@ -33,12 +36,15 @@ static void glfw_error_callback(int error, const char* description)
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
+ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
 int display_w, display_h;
 float colorR = 0;
 
-void Rasterize();
+void DrawFrame();
+void ClearFrame();
 
-void Rasterize()
+void ClearFrame()
 {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -54,11 +60,67 @@ void Rasterize()
     glBegin(GL_POINTS);
     float delta = (float)1.0/255;
     
+    for(int i = 0; i < display_w; i++)
+    {
+        glColor3f(0,0,0);
+        for(int j = 0; j < display_h; j++)
+        {
+            glVertex3f(i,j,0);
+        }
+    }
+    glEnd();
+}
+void Hex2RGB(const int &hex, int &r, int &g, int &b);
+
+void RGB2Hex(int &hex, const int &r, const int &g, const int &b);
+
+void Hex2RGB(const int &c, int &r, int &g, int &b)
+{
+  r = (0xff << 16 & c) >> 16;
+  g = (0xff << 8 & c) >> 8;
+  b = 0xff & c;
+}
+void RGB2Hex(int &c, const int &r, const int &g, const int &b)
+{
+  c = (r<<16) | (g<<8) | b;
+}
+
+void DrawFrame()
+{
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    //        glOrtho(0.0, 500.0, 0.0, 500.0, -1, 1); //设置正射投影的剪裁空间
+    //        glOrtho2D(0.0, 500.0, 50 0.0, 0.0);
     
+    //        glOrtho2D(0.0, 500.0, 500.0, 0.0);
+    //        glOrtho2D(0.0, 500.0, 0.0, 500.0);
+    glOrtho(0.0,display_w,0.0,display_h,0.0,1.0);
+    //    glOrtho(0.0,display_w,0.0,display_h,0.0,1.0);
+    
+    
+    glBegin(GL_POINTS);
+    float delta = (float)1.0/255;
     
     for(int i = 0; i < display_w; i++)
     {
-        glColor3f(colorR,0,0);
+        // glColor3f(colorR,0,0);
+         int c = 0;
+        int R = 255*clear_color.x;
+        int G = 255*clear_color.y;
+        int B = 255*clear_color.z;
+
+        // cout<<"R = "<<R<<"G = "<<G<<"b = "<<B;
+        // c = (R<<16) | (G<<8) | B;
+        RGB2Hex(c, R, G, B);
+        
+        // int r = (0xff << 16 & c) >> 16;
+        // int g = (0xff << 8 & c) >> 8;
+        // int b = 0xff & c;
+
+        int r,g,b;
+        Hex2RGB(c, r, g, b);
+        // cout<<"r = "<<r<<"g = "<<g<<"b = "<<b;
+        glColor3f((float)r/255,(float)g/255,(float)b/255);
         colorR+=delta;
         colorR = colorR>=1.0 ? 0.0 : colorR;
         for(int j = 0; j < display_h; j++)
@@ -73,6 +135,19 @@ void Rasterize()
 
 int main(int, char**)
 {
+    
+//    Mat image;
+//    image = imread("0.jpg", CV_LOAD_IMAGE_COLOR);
+//    if(! image.data )                              // Check for invalid input
+//    {
+//        cout <<  "Could not open or find the image" << std::endl ;
+//        return -1;
+//    }
+//
+//    namedWindow( "Display window", CV_WINDOW_AUTOSIZE );// Create a window for display.
+//    imshow( "Display window", image );
+    
+    
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
@@ -116,7 +191,7 @@ int main(int, char**)
     // Our state
     bool show_demo_window = true;
     bool show_another_window = false;
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    // ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -183,7 +258,8 @@ int main(int, char**)
         double elapsedTime;
         gettimeofday(&t1, NULL);
         
-        Rasterize();
+
+        DrawFrame();
         
         gettimeofday(&t2, NULL);
         

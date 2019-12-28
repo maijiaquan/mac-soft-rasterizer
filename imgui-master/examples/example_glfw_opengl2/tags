@@ -1,0 +1,28 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+CFLAGS	Makefile	/^	CFLAGS = $(CXXFLAGS)$/;"	m
+CFLAGS	Makefile	/^   CFLAGS = $(CXXFLAGS)$/;"	m
+CXXFLAGS	Makefile	/^	CXXFLAGS = -I..\/ -I..\/..\/ -I\/usr\/local\/include$/;"	m
+CXXFLAGS	Makefile	/^	CXXFLAGS = -I..\/ -I..\/..\/ `pkg-config --cflags glfw3`$/;"	m
+CXXFLAGS	Makefile	/^   CXXFLAGS = -I..\/ -I..\/..\/ -I..\/libs\/gl3w `pkg-config --cflags glfw3`$/;"	m
+ECHO_MESSAGE	Makefile	/^	ECHO_MESSAGE = "Linux"$/;"	m
+ECHO_MESSAGE	Makefile	/^	ECHO_MESSAGE = "Mac OS X"$/;"	m
+ECHO_MESSAGE	Makefile	/^   ECHO_MESSAGE = "Windows"$/;"	m
+EXE	Makefile	/^EXE = example_glfw_opengl2$/;"	m
+GL_SILENCE_DEPRECATION	main.cpp	/^#define GL_SILENCE_DEPRECATION$/;"	d	file:
+LIBS	Makefile	/^	LIBS = -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo$/;"	m
+LIBS	Makefile	/^	LIBS = -lGL `pkg-config --static --libs glfw3`$/;"	m
+LIBS	Makefile	/^   LIBS = -lglfw3 -lgdi32 -lopengl32 -limm32$/;"	m
+OBJS	Makefile	/^OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))$/;"	m
+Rasterize	main.cpp	/^void Rasterize()$/;"	f
+SOURCES	Makefile	/^SOURCES = main.cpp$/;"	m
+UNAME_S	Makefile	/^UNAME_S := $(shell uname -s)$/;"	m
+colorR	main.cpp	/^float colorR = 0;$/;"	v
+display_h	main.cpp	/^int display_w, display_h;$/;"	v
+display_w	main.cpp	/^int display_w, display_h;$/;"	v
+glfw_error_callback	main.cpp	/^static void glfw_error_callback(int error, const char* description)$/;"	f	file:
+main	main.cpp	/^int main(int, char**)$/;"	f
