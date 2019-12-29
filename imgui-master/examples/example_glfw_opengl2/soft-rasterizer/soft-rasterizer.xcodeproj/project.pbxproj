@@ -8,17 +8,17 @@
 
 /* Begin PBXFileReference section */
 		4C140E8A23B760080048CFD3 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../main.cpp; sourceTree = "<group>"; };
-		4CA4B93623B791E800188A6B /* libopencv_core.2.4.13.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_core.2.4.13.dylib; path = "../../../../../../opencv-2.4.13.6/release/lib/libopencv_core.2.4.13.dylib"; sourceTree = "<group>"; };
-		4CA4B93723B791F900188A6B /* libopencv_highgui.2.4.13.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_highgui.2.4.13.dylib; path = "../../../../../../opencv-2.4.13.6/release/lib/libopencv_highgui.2.4.13.dylib"; sourceTree = "<group>"; };
+		4CA4B93C23B8E1F900188A6B /* ds.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ds.cpp; path = ../ds.cpp; sourceTree = "<group>"; };
+		4CA4B93D23B8E1F900188A6B /* ds.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ds.h; path = ../ds.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		4C140E7F23B75FA60048CFD3 = {
 			isa = PBXGroup;
 			children = (
+				4CA4B93C23B8E1F900188A6B /* ds.cpp */,
+				4CA4B93D23B8E1F900188A6B /* ds.h */,
 				4C140E8A23B760080048CFD3 /* main.cpp */,
-				4CA4B93623B791E800188A6B /* libopencv_core.2.4.13.dylib */,
-				4CA4B93723B791F900188A6B /* libopencv_highgui.2.4.13.dylib */,
 			);
 			sourceTree = "<group>";
 		};

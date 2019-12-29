@@ -15,6 +15,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <ctime>
+#include "ds.h"
 using namespace cv;
 
 using namespace std;
@@ -36,14 +37,109 @@ static void glfw_error_callback(int error, const char* description)
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
+//全局变量
+int *framebuffer;
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 int display_w, display_h;
 float colorR = 0;
 
+POINT4D cam_pos = {0, 0, -100, 1};
+VECTOR4D cam_dir = {0, 0, 0, 1};
+
+// all your initialization code goes here...
+VECTOR4D vscale = {.5, .5, .5, 1},
+		 vpos = {0, 0, 0, 1},
+		 vrot = {0, 0, 0, 1};
+
+RENDERLIST4DV1 rend_list;			// the single renderlist
+POLYF4DV1 poly1;					// our lonely polygon
+CAM4DV1 cam;						// the single camera
+POINT4D poly1_pos = {0, 0, 100, 1}; // world position of polygon
+USHORT(*RGB16Bit)
+(int r, int g, int b) = nullptr;
 void DrawFrame();
 void ClearFrame();
 
+void Build_Sin_Cos_Tables(void);
+
+void Build_Sin_Cos_Tables(void)
+{
+	for (int ang = 0; ang <= 360; ang++)
+	{
+		float theta = (float)ang * PI / (float)180;
+		cos_look[ang] = cos(theta);
+		sin_look[ang] = sin(theta);
+	}
+}
+void device_pixel(int x, int y, int c)
+{
+  framebuffer[y*display_w + x] = c;
+}
+void device_draw_line(int x1, int y1, int x2, int y2, int c)
+{
+	// std::cout<<"x1 = "<<x1<<"y1 = "<<y1<<std::endl;
+	// std::cout<<"x2 = "<<x2<<"y2 = "<<y2<<std::endl;
+
+	int x, y, rem = 0;
+	if (x1 == x2 && y1 == y2)
+	{
+      device_pixel(x1, y1, c);
+	}
+	else if (x1 == x2)
+	{
+		int inc = (y1 <= y2) ? 1 : -1;
+		for (y = y1; y != y2; y += inc)
+          device_pixel(x1, y, c);
+		device_pixel(x2, y2, c);
+	}
+	else if (y1 == y2)
+	{
+		int inc = (x1 <= x2) ? 1 : -1;
+		for (x = x1; x != x2; x += inc)
+			device_pixel(x, y1, c);
+		device_pixel(x2, y2, c);
+	}
+	else
+	{
+		int dx = (x1 < x2) ? x2 - x1 : x1 - x2;
+		int dy = (y1 < y2) ? y2 - y1 : y1 - y2;
+		if (dx >= dy)
+		{
+			if (x2 < x1)
+				x = x1, y = y1, x1 = x2, y1 = y2, x2 = x, y2 = y;
+			for (x = x1, y = y1; x <= x2; x++)
+			{
+				device_pixel(x, y, c);
+				rem += dy;
+				if (rem >= dx)
+				{
+					rem -= dx;
+					y += (y2 >= y1) ? 1 : -1;
+					device_pixel(x, y, c);
+				}
+			}
+			device_pixel(x2, y2, c);
+		}
+		else
+		{
+			if (y2 < y1)
+				x = x1, y = y1, x1 = x2, y1 = y2, x2 = x, y2 = y;
+			for (x = x1, y = y1; y <= y2; y++)
+			{
+				device_pixel(x, y, c);
+				rem += dx;
+				if (rem >= dy)
+				{
+					rem -= dy;
+					x += (x2 >= x1) ? 1 : -1;
+					device_pixel(x, y, c);
+				}
+			}
+			device_pixel(x2, y2, c);
+		}
+	}
+}
 void ClearFrame()
 {
     glMatrixMode(GL_PROJECTION);
@@ -70,26 +166,139 @@ void ClearFrame()
     }
     glEnd();
 }
-void Hex2RGB(const int &hex, int &r, int &g, int &b);
+void Color2RGB(const int &hex, int &r, int &g, int &b);
 
-void RGB2Hex(int &hex, const int &r, const int &g, const int &b);
+void RGB2Color(int &hex, const int &r, const int &g, const int &b);
 
-void Hex2RGB(const int &c, int &r, int &g, int &b)
+void GameMain();
+void GameInit();
+
+void Color2RGB(const int &c, int &r, int &g, int &b)
 {
   r = (0xff << 16 & c) >> 16;
   g = (0xff << 8 & c) >> 8;
   b = 0xff & c;
 }
-void RGB2Hex(int &c, const int &r, const int &g, const int &b)
+
+void RGB2Color(int &c, const int &r, const int &g, const int &b)
 {
   c = (r<<16) | (g<<8) | b;
 }
 
+
+void GameInit()
+{
+	RGB16Bit = RGB16Bit565;
+
+	Build_Sin_Cos_Tables();
+	poly1.state = POLY4DV1_STATE_ACTIVE;
+	poly1.attr = 0;
+	poly1.color = RGB16Bit(0, 255, 0);
+
+	poly1.vlist[0].x = 0;
+	poly1.vlist[0].y = 50;
+	poly1.vlist[0].z = 0;
+	poly1.vlist[0].w = 1;
+
+	poly1.vlist[1].x = 50;
+	poly1.vlist[1].y = -50;
+	poly1.vlist[1].z = 0;
+	poly1.vlist[1].w = 1;
+
+	poly1.vlist[2].x = -50;
+	poly1.vlist[2].y = -50;
+	poly1.vlist[2].z = 0;
+	poly1.vlist[2].w = 1;
+
+	poly1.next = poly1.prev = NULL;
+
+	// initialize the camera with 90 FOV, normalized coordinates
+	Init_CAM4DV1(&cam,			  // the camera object
+				 CAM_MODEL_EULER, // euler camera model
+				 &cam_pos,		  // initial camera position
+				 &cam_dir,		  // initial camera angles
+				 NULL,			  // no initial target
+				 50.0,			  // near and far clipping planes
+				 500.0,
+				 90.0,		   // field of view in degrees
+				 WINDOW_WIDTH, // size of final screen viewport
+				 WINDOW_HEIGHT);
+}
+void GameMain()
+{
+  // for(int i = 0; i < display_h; i++)
+  // {
+    // for(int j = 0; j < display_w; j++)
+    // {
+        // RGB2Color(framebuffer[i*display_w + j], 255*clear_color.x, 255*clear_color.y, 255*clear_color.z);
+    // }
+  // }
+
+
+  for(int i = 0; i < 100; i++)
+  {
+    for(int j = 0; j < 200; j++)
+    {
+        RGB2Color(framebuffer[i*display_w + j], 255*clear_color.x, 255*clear_color.y, 255*clear_color.z);
+    }
+  }
+	static MATRIX4X4 gMatrixRotate; // general rotation matrix
+
+	static float ang_y = 0; // rotation angle
+
+	Reset_RENDERLIST4DV1(&rend_list);
+	Insert_POLYF4DV1_RENDERLIST4DV1(&rend_list, &poly1);
+	Build_XYZ_Rotation_MATRIX4X4(0, ang_y, 0, &gMatrixRotate);
+
+	ang_y += 10;
+	if (ang_y >= 360.0)
+		ang_y = 0;
+
+
+	Transform_RENDERLIST4DV1(&rend_list, &gMatrixRotate, TRANSFORM_LOCAL_ONLY);
+	Model_To_World_RENDERLIST4DV1(&rend_list, &poly1_pos);
+	Build_CAM4DV1_Matrix_Euler(&cam, CAM_ROT_SEQ_ZYX);
+	World_To_Camera_RENDERLIST4DV1(&rend_list, &cam);
+	Camera_To_Perspective_RENDERLIST4DV1(&rend_list, &cam);
+	Perspective_To_Screen_RENDERLIST4DV1(&rend_list, &cam);
+
+	RENDERLIST4DV1_PTR rend_list_ptr = &rend_list;
+
+	for (int idx_poly = 0; idx_poly < rend_list_ptr->num_polys; idx_poly++)
+	{
+        // std::cout << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[0].x << std::endl;
+        // std::cout << "x1 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[0].x << std::endl;
+        // std::cout << "y1 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[0].y << std::endl;
+        // std::cout << "x2 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[1].x << std::endl;
+        // std::cout << "y2 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[1].y << std::endl;
+        // std::cout << "x3 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[2].x << std::endl;
+        // std::cout << "y3 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[2].y << std::endl;
+        // std::cout << "-----" << std::endl;
+
+
+
+		float x1 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[0].x;
+		float y1 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[0].y;
+		float x2 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[1].x;
+		float y2 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[1].y;
+		float x3 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[2].x;
+		float y3 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[2].y;
+
+        int c; 
+        RGB2Color(c,255,255,255);
+
+       device_draw_line(x1, y1, x2, y2,c); //3 1
+       device_draw_line(x1, y1, x3, y3,c); //3 1
+       device_draw_line(x2, y2, x3, y3,c); //3 1
+
+	} // end for poly
+}
 void DrawFrame()
 {
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    //        glOrtho(0.0, 500.0, 0.0, 500.0, -1, 1); //设置正射投影的剪裁空间
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  //        glOrtho(0.0, 500.0, 0.0, 500.0, -1, 1); //设置正射投影的剪裁空间
     //        glOrtho2D(0.0, 500.0, 50 0.0, 0.0);
     
     //        glOrtho2D(0.0, 500.0, 500.0, 0.0);
@@ -101,32 +310,32 @@ void DrawFrame()
     glBegin(GL_POINTS);
     float delta = (float)1.0/255;
     
-    for(int i = 0; i < display_w; i++)
+    for(int i = 0; i < display_h; i++)
     {
-        // glColor3f(colorR,0,0);
-         int c = 0;
-        int R = 255*clear_color.x;
-        int G = 255*clear_color.y;
-        int B = 255*clear_color.z;
-
+      // glColor3f(colorR,0,0);
+      // int c = 0;
+      // int R = 255*clear_color.x;
+      // int G = 255*clear_color.y;
+      // int B = 255*clear_color.z;
+//
         // cout<<"R = "<<R<<"G = "<<G<<"b = "<<B;
         // c = (R<<16) | (G<<8) | B;
-        RGB2Hex(c, R, G, B);
+        // RGB2Color(c, R, G, B);
         
         // int r = (0xff << 16 & c) >> 16;
         // int g = (0xff << 8 & c) >> 8;
         // int b = 0xff & c;
 
         int r,g,b;
-        Hex2RGB(c, r, g, b);
-        // cout<<"r = "<<r<<"g = "<<g<<"b = "<<b;
-        glColor3f((float)r/255,(float)g/255,(float)b/255);
-        colorR+=delta;
-        colorR = colorR>=1.0 ? 0.0 : colorR;
-        for(int j = 0; j < display_h; j++)
+        // Color2RGB(c, r, g, b);
+        for(int j = 0; j < display_w; j++)
         {
-            
-            glVertex3f(i,j,0);
+          Color2RGB(framebuffer[i*display_w + j], r, g, b);
+          // cout<<"r = "<<r<<"g = "<<g<<"b = "<<b;
+          // glColor3f((float)r/255,(float)g/255,(float)b/255);
+          glColor3f((float)r/255,(float)g/255,(float)b/255);
+          // glVertex3f(i,j,0);
+          glVertex3f(j,display_h-i,0);
         }
     }
     
@@ -192,6 +401,7 @@ int main(int, char**)
     bool show_demo_window = true;
     bool show_another_window = false;
     // ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    GameInit();
     
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -251,6 +461,7 @@ int main(int, char**)
         
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
+        framebuffer = new int[display_w*display_h];
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
         
@@ -259,6 +470,7 @@ int main(int, char**)
         gettimeofday(&t1, NULL);
         
 
+        GameMain();
         DrawFrame();
         
         gettimeofday(&t2, NULL);
