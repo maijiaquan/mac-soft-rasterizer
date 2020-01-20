@@ -7,70 +7,70 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		4C140E8A23B760080048CFD3 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../main.cpp; sourceTree = "<group>"; };
-		4CA4B93C23B8E1F900188A6B /* ds.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ds.cpp; path = ../ds.cpp; sourceTree = "<group>"; };
-		4CA4B93D23B8E1F900188A6B /* ds.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ds.h; path = ../ds.h; sourceTree = "<group>"; };
+		C6D9DC1D23D5592E00D4D8C0 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../main.cpp; sourceTree = "<group>"; };
+		C6D9DC1E23D5592F00D4D8C0 /* ds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ds.h; path = ../ds.h; sourceTree = "<group>"; };
+		C6D9DC1F23D5592F00D4D8C0 /* ds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ds.cpp; path = ../ds.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-		4C140E7F23B75FA60048CFD3 = {
+		C6D9DC1223D53E7500D4D8C0 = {
 			isa = PBXGroup;
 			children = (
-				4CA4B93C23B8E1F900188A6B /* ds.cpp */,
-				4CA4B93D23B8E1F900188A6B /* ds.h */,
-				4C140E8A23B760080048CFD3 /* main.cpp */,
+				C6D9DC1F23D5592F00D4D8C0 /* ds.cpp */,
+				C6D9DC1E23D5592F00D4D8C0 /* ds.h */,
+				C6D9DC1D23D5592E00D4D8C0 /* main.cpp */,
 			);
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXLegacyTarget section */
-		4C140E8423B75FA60048CFD3 /* soft-rasterizer */ = {
+		C6D9DC1723D53E7500D4D8C0 /* testSDLimgui */ = {
 			isa = PBXLegacyTarget;
 			buildArgumentsString = "$(ACTION)";
-			buildConfigurationList = 4C140E8723B75FA60048CFD3 /* Build configuration list for PBXLegacyTarget "soft-rasterizer" */;
+			buildConfigurationList = C6D9DC1A23D53E7500D4D8C0 /* Build configuration list for PBXLegacyTarget "testSDLimgui" */;
 			buildPhases = (
 			);
 			buildToolPath = /usr/bin/make;
-			buildWorkingDirectory = "/Users/jackmai/Downloads/github/mac-soft-rasterizer/imgui-master/examples/example_glfw_opengl2";
+			buildWorkingDirectory = "/Users/jackmai/Downloads/github/mac-soft-rasterizer/imgui-master/examples/example_sdl_opengl2";
 			dependencies = (
 			);
-			name = "soft-rasterizer";
+			name = testSDLimgui;
 			passBuildSettingsInEnvironment = 1;
-			productName = "soft-rasterizer";
+			productName = testSDLimgui;
 		};
 /* End PBXLegacyTarget section */
 
 /* Begin PBXProject section */
-		4C140E8023B75FA60048CFD3 /* Project object */ = {
+		C6D9DC1323D53E7500D4D8C0 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1000;
-				ORGANIZATIONNAME = hku;
+				LastUpgradeCheck = 1030;
+				ORGANIZATIONNAME = Jackmai;
 				TargetAttributes = {
-					4C140E8423B75FA60048CFD3 = {
-						CreatedOnToolsVersion = 10.0;
+					C6D9DC1723D53E7500D4D8C0 = {
+						CreatedOnToolsVersion = 10.3;
 					};
 				};
 			};
-			buildConfigurationList = 4C140E8323B75FA60048CFD3 /* Build configuration list for PBXProject "soft-rasterizer" */;
+			buildConfigurationList = C6D9DC1623D53E7500D4D8C0 /* Build configuration list for PBXProject "testSDLimgui" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = 4C140E7F23B75FA60048CFD3;
+			mainGroup = C6D9DC1223D53E7500D4D8C0;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				4C140E8423B75FA60048CFD3 /* soft-rasterizer */,
+				C6D9DC1723D53E7500D4D8C0 /* testSDLimgui */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin XCBuildConfiguration section */
-		4C140E8523B75FA60048CFD3 /* Debug */ = {
+		C6D9DC1823D53E7500D4D8C0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -126,7 +126,7 @@
 			};
 			name = Debug;
 		};
-		4C140E8623B75FA60048CFD3 /* Release */ = {
+		C6D9DC1923D53E7500D4D8C0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -175,13 +175,12 @@
 			};
 			name = Release;
 		};
-		4C140E8823B75FA60048CFD3 /* Debug */ = {
+		C6D9DC1B23D53E7500D4D8C0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEBUGGING_SYMBOLS = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = XHD4L6N83J;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				OTHER_CFLAGS = "";
@@ -190,12 +189,11 @@
 			};
 			name = Debug;
 		};
-		4C140E8923B75FA60048CFD3 /* Release */ = {
+		C6D9DC1C23D53E7500D4D8C0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = XHD4L6N83J;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -205,25 +203,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		4C140E8323B75FA60048CFD3 /* Build configuration list for PBXProject "soft-rasterizer" */ = {
+		C6D9DC1623D53E7500D4D8C0 /* Build configuration list for PBXProject "testSDLimgui" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4C140E8523B75FA60048CFD3 /* Debug */,
-				4C140E8623B75FA60048CFD3 /* Release */,
+				C6D9DC1823D53E7500D4D8C0 /* Debug */,
+				C6D9DC1923D53E7500D4D8C0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4C140E8723B75FA60048CFD3 /* Build configuration list for PBXLegacyTarget "soft-rasterizer" */ = {
+		C6D9DC1A23D53E7500D4D8C0 /* Build configuration list for PBXLegacyTarget "testSDLimgui" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4C140E8823B75FA60048CFD3 /* Debug */,
-				4C140E8923B75FA60048CFD3 /* Release */,
+				C6D9DC1B23D53E7500D4D8C0 /* Debug */,
+				C6D9DC1C23D53E7500D4D8C0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 4C140E8023B75FA60048CFD3 /* Project object */;
+	rootObject = C6D9DC1323D53E7500D4D8C0 /* Project object */;
 }
