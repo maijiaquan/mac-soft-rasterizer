@@ -10,12 +10,16 @@
 		C6D9DC1D23D5592E00D4D8C0 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../main.cpp; sourceTree = "<group>"; };
 		C6D9DC1E23D5592F00D4D8C0 /* ds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ds.h; path = ../ds.h; sourceTree = "<group>"; };
 		C6D9DC1F23D5592F00D4D8C0 /* ds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ds.cpp; path = ../ds.cpp; sourceTree = "<group>"; };
+		C6F0F56023D6FBAA00392AE4 /* draw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = draw.h; path = ../draw.h; sourceTree = "<group>"; };
+		C6F0F56123D6FBAA00392AE4 /* draw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = draw.cpp; path = ../draw.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		C6D9DC1223D53E7500D4D8C0 = {
 			isa = PBXGroup;
 			children = (
+				C6F0F56123D6FBAA00392AE4 /* draw.cpp */,
+				C6F0F56023D6FBAA00392AE4 /* draw.h */,
 				C6D9DC1F23D5592F00D4D8C0 /* ds.cpp */,
 				C6D9DC1E23D5592F00D4D8C0 /* ds.h */,
 				C6D9DC1D23D5592E00D4D8C0 /* main.cpp */,

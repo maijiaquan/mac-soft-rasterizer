@@ -1,6 +1,11 @@
+#pragma once
+
+#include <math.h>
+
 typedef unsigned short USHORT;
 typedef unsigned char UCHAR;
 typedef unsigned int IUINT32;
+
 
 #define FLT_MIN 1.175494351e-38F 
 #define FLT_MAX 3.402823466e+38F 
@@ -11,6 +16,21 @@ typedef unsigned int IUINT32;
 
 #define _RGB565FROM16BIT(RGB, r,g,b) { *r = ( ((RGB) >> 11) & 0x1f); *g = (((RGB) >> 5) & 0x3f); *b = ((RGB) & 0x1f); 
 #define _RGB16BIT565(r, g, b) ((b & 31) + ((g & 63) << 5) + ((r & 31) << 11))
+
+#define EPSILON_E3 (float)(1E-3)
+#define EPSILON_E4 (float)(1E-4)
+#define EPSILON_E5 (float)(1E-5)
+#define EPSILON_E6 (float)(1E-6)
+#define FCMP(a,b) ( (fabs(a-b) < EPSILON_E3) ? 1 : 0)
+#define SWAP(a,b,t) {t=a; a=b; b=t;}
+
+#define WINDOW_WIDTH 600 // size of window
+#define WINDOW_HEIGHT 600
+
+#define min_clip_x  0 // clipping rectangle
+#define max_clip_x  (WINDOW_WIDTH - 1)
+#define min_clip_y  0
+#define max_clip_y  (WINDOW_HEIGHT - 1)
 
 #define RENDERLIST4DV1_MAX_POLYS 32768 // 16384
 #define POLY4DV1_STATE_ACTIVE 0x0001

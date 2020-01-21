@@ -250,6 +250,7 @@ OBJECT4DV2 obj_constant_water,
 RGBAV1 white, gray, black, red, green, blue;
 void InitDemo9_2()
 {
+    Build_Sin_Cos_Tables();
     // POINT4D cam_pos = {0, 0, 0, 1};
     POINT4D cam_pos = {105, 0, 13, 1};
     POINT4D cam_target = {0, 0, 0, 1};
@@ -271,21 +272,21 @@ void InitDemo9_2()
                  WINDOW_WIDTH, // size of final screen viewport
                  WINDOW_HEIGHT);
 
-    VECTOR4D_INITXYZ(&vscale, 10.00, 10.00, 10.00);
+    VECTOR4D_INITXYZ(&vscale, 20.00, 20.00, 20.00);
 
     // Load_OBJECT4DV2_COB(&obj_constant_water, "./cob/water_constant_01.cob",
     // Load_OBJECT4DV2_COB(&obj_constant_water, "./cob/cube_constant_01.cob",						&vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD);
     Load_OBJECT4DV2_COB(&obj_constant_water, "./cob/water_flat_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD);
 
-    //    Load_OBJECT4DV2_COB(&obj_flat_water, "./cob/cube_flat_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD);
     // load flat shaded water
-    VECTOR4D_INITXYZ(&vscale, 10.00, 10.00, 10.00);
-    //    Load_OBJECT4DV2_COB(&obj_flat_water, "./cob/water_flat_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD);
-    Load_OBJECT4DV2_COB(&obj_flat_water, "./cob/water_gouraud_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD); //修改颜色后的水分子
+    VECTOR4D_INITXYZ(&vscale, 20.00, 20.00, 20.00);
+    // Load_OBJECT4DV2_COB(&obj_flat_water, "./cob/water_gouraud_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD); //修改颜色后的水分子
+    Load_OBJECT4DV2_COB(&obj_flat_water, "./cob/water_flat_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD);
 
     // load gouraud shaded water
-    VECTOR4D_INITXYZ(&vscale, 10.00, 10.00, 10.00);
-    Load_OBJECT4DV2_COB(&obj_gouraud_water, "./cob/water_flat_01_gouraud.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD); //修改颜色后的水分子
+    VECTOR4D_INITXYZ(&vscale, 20.00, 20.00, 20.00);
+    // Load_OBJECT4DV2_COB(&obj_gouraud_water, "./cob/water_flat_01_gouraud.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD); //修改颜色后的水分子
+    Load_OBJECT4DV2_COB(&obj_gouraud_water, "./cob/water_flat_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD);
                                                                                                                                                                                                  //    Load_OBJECT4DV2_COB(&obj_gouraud_water, "./cob/water_gouraud_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD); //修改颜色后的水分子
 
     VECTOR4D_INITXYZ(&vscale, 5.00, 5.00, 5.00);
@@ -559,7 +560,8 @@ void DrawDemo9_2()
     // update rotation angles
     // if ((x_ang += 1) > 360)
     // 	x_ang = 0;
-    if (gF1)
+    // if (gF1)
+    if (true)
     {
         if ((y_ang += 2) > 360)
             y_ang = 0;
@@ -612,6 +614,7 @@ void DrawDemo9_2()
             //  rend_list->poly_ptrs[poly]->lit_color[0]
             // DrawTrianglePureColor(&device, x1, y1, x2, y2, x3, y3, color);
             // DrawTrianglePureColor2(&device, x1, y1, x2, y2, x3, y3, color);
+            DrawTrianglePureColor2(framebuffer, x1, y1, x2, y2, x3, y3, color);
             //  device_draw_line(&device, x1, y1, x2, y2, c);
             //  device_draw_line(&device, x1, y1, x3, y3, c);
             //  device_draw_line(&device, x2, y2, x3, y3, c);
@@ -784,7 +787,7 @@ int main(int, char **)
             display_h = (int)io.DisplaySize.y;
             framebuffer = new int[display_w * display_h];
             InitDemo9_2();
-            GameInit();
+            // GameInit();
             tmpCount++;
             // cout<<"while (int)io.DisplaySize.x = "<<(int)io.DisplaySize.x<<"while (int)io.DisplaySize.y = "<<(int)io.DisplaySize.y<<endl;
             cout << "h = " << display_h << "w = " << display_w << endl;
@@ -793,8 +796,21 @@ int main(int, char **)
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        GameMain();
+        // GameMain();
+        //清屏
+        int greyLevel = 255;
+        // for (int i = 0; i < display_w; i++)
+        for (int i = 0; i < display_h; i++)
+        {
+            // for (int j = 0; j < display_h; j++)
+            for (int j = 0; j < display_w; j++)
+            {
+                // RGB2Color(framebuffer[i * display_w + j], greyLevel * clear_color.x, greyLevel * clear_color.y, greyLevel * clear_color.z);
+                RGB2Color(framebuffer[i * display_w + j], greyLevel * clear_color.x, greyLevel * clear_color.y, greyLevel * clear_color.z);
+            }
+        }
         DrawDemo9_2();
+
         DrawFrame();
 
         //glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context where shaders may be bound
