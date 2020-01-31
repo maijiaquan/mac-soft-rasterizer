@@ -811,6 +811,7 @@ int main(int, char **)
         }
         DrawDemo9_2();
 
+
         DrawFrame();
 
         //glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context where shaders may be bound
