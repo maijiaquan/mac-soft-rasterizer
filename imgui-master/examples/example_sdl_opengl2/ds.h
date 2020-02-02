@@ -21,13 +21,11 @@ extern char texture_path[80]; // root path to ALL textures, make current directo
 
 #include <iostream>
 using namespace std;
-//std::string testPrint(std::string inputStr);
 
 //颜色转换
 void Color2RGB(const int &hex, int &r, int &g, int &b);
 void RGB2Color(int &hex, const int &r, const int &g, const int &b);
 
-int testPrint();
 
 //内联函数
 inline void VECTOR3D_INITXYZ(VECTOR3D_PTR v, float x, float y, float z)

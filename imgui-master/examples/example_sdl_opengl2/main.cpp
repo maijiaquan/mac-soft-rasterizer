@@ -19,10 +19,9 @@
 
 //全局变量
 int *framebuffer; //帧缓冲
-// ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.00f, 1.00f);
+ImVec4 clear_color = ImVec4(1.0f, 1.0f, 1.00f, 1.00f);
 int display_w, display_h;
-float colorR = 0;
+
 POINT4D cam_pos = {0, 0, -100, 1};
 VECTOR4D cam_dir = {0, 0, 0, 1};
 
@@ -209,7 +208,6 @@ void DrawFrame()
 
     for (int i = 0; i < display_h; i++)
     {
-        // glColor3f(colorR,0,0);
         // int c = 0;
         // int R = 255*clear_color.x;
         // int G = 255*clear_color.y;
@@ -658,9 +656,6 @@ void DrawDemo9_2()
 int main(int, char **)
 {
 
-    cout << testPrint() << "hello" << endl;
-    //    string s = "fff";
-    //    testPrint(s);
 
     // Setup SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
@@ -796,7 +791,6 @@ int main(int, char **)
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // GameMain();
         //清屏
         int greyLevel = 255;
         // for (int i = 0; i < display_w; i++)

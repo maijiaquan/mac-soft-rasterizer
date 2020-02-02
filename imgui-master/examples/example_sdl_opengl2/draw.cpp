@@ -72,7 +72,7 @@ void device_draw_line(int *fb, int x1, int y1, int x2, int y2, int c)
         }
     }
 }
-void DrawDownTriangle(int *fb, int x1, int y1, int x2, int y2, int x3, int y3, IUINT32 color)
+void DrawDownTrianglePureColor(int *fb, int x1, int y1, int x2, int y2, int x3, int y3, IUINT32 color)
 {
         float dx_right, // the dx/dy ratio of the right edge of line
         dx_left,    // the dx/dy ratio of the left edge of line
@@ -175,7 +175,7 @@ void DrawDownTriangle(int *fb, int x1, int y1, int x2, int y2, int x3, int y3, I
     } // end else x clipping needed
 }
 
-void DrawTopTriangle(int *fb, int x1, int y1, int x2, int y2, int x3, int y3, IUINT32 color)
+void DrawTopTrianglePureColor(int *fb, int x1, int y1, int x2, int y2, int x3, int y3, IUINT32 color)
 {
    
     float dx_right, // the dx/dy ratio of the right edge of line
@@ -333,14 +333,14 @@ void DrawTrianglePureColor2(int *fb, float x1, float y1, float x2, float y2, flo
     if (FCMP(y1, y2))
     {
 
-        DrawTopTriangle(fb, x1, y1, x2, y2, x3, y3, c);
+        DrawTopTrianglePureColor(fb, x1, y1, x2, y2, x3, y3, c);
         // DrawTopTriangle2(fb, x1, y1, x2, y2, x3, y3, c);
     } // end if
     else
     {
         if (FCMP(y2, y3))
         {
-            DrawDownTriangle(fb, x1, y1, x2, y2, x3, y3, c);
+            DrawDownTrianglePureColor(fb, x1, y1, x2, y2, x3, y3, c);
             // DrawDownTriangle2(device, x1, y1, x2, y2, x3, y3, c);
         } // end if bottom is flat
         else
@@ -348,9 +348,9 @@ void DrawTrianglePureColor2(int *fb, float x1, float y1, float x2, float y2, flo
             // draw each sub-triangle
             // new_x = x1 + (int)(0.5 + (float)(y2 - y1) * (float)(x3 - x1) / (float)(y3 - y1));
             new_x = x1 + (y2 - y1) * (x3 - x1) / (y3 - y1);
-            DrawDownTriangle(fb, x1, y1, new_x, y2, x2, y2, c);
+            DrawDownTrianglePureColor(fb, x1, y1, new_x, y2, x2, y2, c);
             // DrawDownTriangle2(device, x1, y1, new_x, y2, x2, y2, c);
-            DrawTopTriangle(fb, x2, y2, new_x, y2, x3, y3, c);
+            DrawTopTrianglePureColor(fb, x2, y2, new_x, y2, x3, y3, c);
             // DrawTopTriangle2(device, x2, y2, new_x, y2, x3, y3, c);
         } // end else
     }
@@ -409,12 +409,12 @@ void DrawTrianglePureColor2(int *fb, float x1, float y1, float x2, float y2, flo
 //     if (FCMP(y1, y2))
 //     {
 
-//         DrawTopTriangle(fb, x1, y1, x2, y2, x3, y3, c);
+//         DrawTopTrianglePureColor(fb, x1, y1, x2, y2, x3, y3, c);
 //         // DrawTopTriangle2(fb, x1, y1, x2, y2, x3, y3, c);
 //     } // end if
 //     else if (FCMP(y2, y3))
 //     {
-//         DrawDownTriangle(fb, x1, y1, x2, y2, x3, y3, c);
+//         DrawDownTrianglePureColor(fb, x1, y1, x2, y2, x3, y3, c);
 //         // DrawDownTriangle2(device, x1, y1, x2, y2, x3, y3, c);
 //     } // end if bottom is flat
 //     else
@@ -422,14 +422,14 @@ void DrawTrianglePureColor2(int *fb, float x1, float y1, float x2, float y2, flo
 //         // draw each sub-triangle
 //         // new_x = x1 + (int)(0.5 + (float)(y2 - y1) * (float)(x3 - x1) / (float)(y3 - y1));
 //         new_x = x1 + (y2 - y1) * (x3 - x1) / (y3 - y1);
-//         DrawDownTriangle(fb, x1, y1, new_x, y2, x2, y2, c);
+//         DrawDownTrianglePureColor(fb, x1, y1, new_x, y2, x2, y2, c);
 //         // DrawDownTriangle2(device, x1, y1, new_x, y2, x2, y2, c);
-//         DrawTopTriangle(fb, x2, y2, new_x, y2, x3, y3, c);
+//         DrawTopTrianglePureColor(fb, x2, y2, new_x, y2, x3, y3, c);
 //         // DrawTopTriangle2(device, x2, y2, new_x, y2, x3, y3, c);
 //     } // end else
 // }
 
-// void DrawDownTriangle(int *fb, int x1, int y1, int x2, int y2, int x3, int y3, IUINT32 color)
+// void DrawDownTrianglePureColor(int *fb, int x1, int y1, int x2, int y2, int x3, int y3, IUINT32 color)
 // {
 //     float dx_right, // the dx/dy ratio of the right edge of line
 //         dx_left,    // the dx/dy ratio of the left edge of line
@@ -532,7 +532,7 @@ void DrawTrianglePureColor2(int *fb, float x1, float y1, float x2, float y2, flo
 //     } // end else x clipping needed
 // }
 
-// void DrawTopTriangle(int *fb, int x1, int y1, int x2, int y2, int x3, int y3, IUINT32 color)
+// void DrawTopTrianglePureColor(int *fb, int x1, int y1, int x2, int y2, int x3, int y3, IUINT32 color)
 // {
 
 //     float dx_right, // the dx/dy ratio of the right edge of line

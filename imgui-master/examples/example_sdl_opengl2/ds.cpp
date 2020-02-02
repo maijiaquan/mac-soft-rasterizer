@@ -25,10 +25,6 @@ USHORT RGB16Bit565(int r, int g, int b)
 
 } // end RGB16Bit565
 
-//std::string testPrint(std::string inputStr)
-//{
-//    return inputStr;
-//}
 
 void Color2RGB(const int &c, int &r, int &g, int &b)
 {
@@ -42,10 +38,6 @@ void RGB2Color(int &c, const int &r, const int &g, const int &b)
     c = (r << 16) | (g << 8) | b;
 }
 
-int testPrint()
-{
-    return 44;
-}
 void Reset_RENDERLIST4DV1(RENDERLIST4DV1_PTR renderList)
 {
     renderList->num_polys = 0;
