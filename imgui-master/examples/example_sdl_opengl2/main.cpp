@@ -19,6 +19,13 @@
 //using namespace std;
 
 //全局变量
+enum RenderType
+{
+    Wireframe,
+    PureTriangle
+};
+
+static int multipleChoice = 0;
 int *framebuffer; //帧缓冲
 ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.00f, 1.00f);
 int display_w, display_h;
@@ -36,23 +43,11 @@ RENDERLIST4DV2 rend_list2;          // the render list
 POLYF4DV1 poly1;                    // our lonely polygon
 CAM4DV1 cam;                        // the single camera
 POINT4D poly1_pos = {0, 0, 100, 1}; // world position of polygon
-OBJECT4DV1 obj;                     // used to hold our cube mesh
-    static float x_ang = 0, y_ang = 0, z_ang = 0;
+// OBJECT4DV1 obj;                     // used to hold our cube mesh
+static float x_ang = 0, y_ang = 0, z_ang = 0;
 USHORT(*RGB16Bit)
 (int r, int g, int b) = nullptr;
 void ClearFrame();
-
-void Build_Sin_Cos_Tables(void);
-
-void Build_Sin_Cos_Tables(void)
-{
-    for (int ang = 0; ang <= 360; ang++)
-    {
-        float theta = (float)ang * PI / (float)180;
-        cos_look[ang] = cos(theta);
-        sin_look[ang] = sin(theta);
-    }
-}
 
 void ClearFrame()
 {
@@ -559,6 +554,35 @@ void DrawDemo9_2()
 
     POLYF4DV2 face; // temp face used to render polygon
 
+    // RENDERLIST4DV1_PTR rend_list_ptr = &rend_list;
+
+    for (int idx_poly = 0; idx_poly < rend_list_ptr->num_polys; idx_poly++)
+    {
+        // std::cout << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[0].x << std::endl;
+        // std::cout << "x1 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[0].x << std::endl;
+        // std::cout << "y1 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[0].y << std::endl;
+        // std::cout << "x2 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[1].x << std::endl;
+        // std::cout << "y2 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[1].y << std::endl;
+        // std::cout << "x3 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[2].x << std::endl;
+        // std::cout << "y3 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[2].y << std::endl;
+        // std::cout << "-----" << std::endl;
+
+        // float x1 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[0].x;
+        // float y1 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[0].y;
+        // float x2 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[1].x;
+        // float y2 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[1].y;
+        // float x3 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[2].x;
+        // float y3 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[2].y;
+
+        // int c;
+        // RGB2Color(c, 255, 255, 255);
+
+        // device_draw_line(framebuffer,x1, y1, x2, y2, c); //3 1
+        // device_draw_line(framebuffer,x1, y1, x3, y3, c); //3 1
+        // device_draw_line(framebuffer,x2, y2, x3, y3, c); //3 1
+
+    } // end for poly
+
     for (int poly = 0; poly < rend_list_ptr->num_polys; poly++)
     {
         if (!(rend_list_ptr->poly_ptrs[poly]->state & POLY4DV1_STATE_ACTIVE) || (rend_list_ptr->poly_ptrs[poly]->state & POLY4DV1_STATE_CLIPPED) || (rend_list_ptr->poly_ptrs[poly]->state & POLY4DV1_STATE_BACKFACE))
@@ -574,18 +598,28 @@ void DrawDemo9_2()
         if ((rend_list_ptr->poly_ptrs[poly]->attr & POLY4DV2_ATTR_SHADE_MODE_FLAT) ||
             (rend_list_ptr->poly_ptrs[poly]->attr & POLY4DV2_ATTR_SHADE_MODE_CONSTANT))
         {
+            if(multipleChoice == PureTriangle)
+            {
+                DrawTrianglePureColor2(framebuffer, x1, y1, x2, y2, x3, y3, color);
+            }
+            else if(multipleChoice == Wireframe)
+            {
+                float x1 = rend_list_ptr->poly_ptrs[poly]->tvlist[0].x;
+                float y1 = rend_list_ptr->poly_ptrs[poly]->tvlist[0].y;
+                float x2 = rend_list_ptr->poly_ptrs[poly]->tvlist[1].x;
+                float y2 = rend_list_ptr->poly_ptrs[poly]->tvlist[1].y;
+                float x3 = rend_list_ptr->poly_ptrs[poly]->tvlist[2].x;
+                float y3 = rend_list_ptr->poly_ptrs[poly]->tvlist[2].y;
 
-            IUINT32 c = (255 << 16) | (255 << 8) | 255;
+                int c;
+                RGB2Color(c, 255, 255, 255);
 
-            //  std::cout<<"color = "<<color<<std::endl;
-            //  int color = rend_list_ptr->poly_ptrs[poly]->color;
-            //  rend_list->poly_ptrs[poly]->lit_color[0]
-            // DrawTrianglePureColor(&device, x1, y1, x2, y2, x3, y3, color);
-            // DrawTrianglePureColor2(&device, x1, y1, x2, y2, x3, y3, color);
-            DrawTrianglePureColor2(framebuffer, x1, y1, x2, y2, x3, y3, color);
-            //  device_draw_line(&device, x1, y1, x2, y2, c);
-            //  device_draw_line(&device, x1, y1, x3, y3, c);
-            //  device_draw_line(&device, x2, y2, x3, y3, c);
+                device_draw_line(framebuffer, x1, y1, x2, y2, c); //3 1
+                device_draw_line(framebuffer, x1, y1, x3, y3, c); //3 1
+                device_draw_line(framebuffer, x2, y2, x3, y3, c); //3 1
+            }
+            
+
         }
         else if (rend_list_ptr->poly_ptrs[poly]->attr & POLY4DV2_ATTR_SHADE_MODE_GOURAUD)
         {
@@ -719,6 +753,12 @@ int main(int, char **)
             ImGui::Text("This is some useful text.");          // Display some text (you can use a format strings too)
             ImGui::Checkbox("Demo Window", &show_demo_window); // Edit bools storing our window open/close state
             ImGui::Checkbox("Another Window", &show_another_window);
+
+            ImGui::RadioButton("Wireframe", &multipleChoice, Wireframe);
+            ImGui::SameLine();
+            ImGui::RadioButton("PureTriangle", &multipleChoice, PureTriangle);
+            ImGui::SameLine();
+            ImGui::RadioButton("radio c", &multipleChoice, 2);
 
             ImGui::SliderFloat("cam.pos.z", &cam.pos.z, -100.0f, 100.0f);             
             ImGui::SliderFloat("cam.pos.y", &cam.pos.y, -100.0f, 100.0f);             

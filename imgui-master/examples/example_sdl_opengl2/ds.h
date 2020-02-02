@@ -22,6 +22,8 @@ extern char texture_path[80]; // root path to ALL textures, make current directo
 // extern BITMAP_FILE bitmap16bit; // a 16 bit bitmap file
 
 
+void Build_Sin_Cos_Tables(void);
+
 //颜色转换
 void Color2RGB(const int &hex, int &r, int &g, int &b);
 void RGB2Color(int &hex, const int &r, const int &g, const int &b);
@@ -276,3 +278,5 @@ inline void VERTEX4DTV1_COPY(VERTEX4DTV1_PTR vdst, VERTEX4DTV1_PTR vsrc)
 {
 	*vdst = *vsrc;
 }
+
+

@@ -14,6 +14,15 @@ char texture_path[80] = "./"; // root path to ALL textures, make current directo
 MATV1 materials[MAX_MATERIALS]; // materials in system
 int num_materials;              // current number of materials
 
+void Build_Sin_Cos_Tables(void)
+{
+    for (int ang = 0; ang <= 360; ang++)
+    {
+        float theta = (float)ang * PI / (float)180;
+        cos_look[ang] = cos(theta);
+        sin_look[ang] = sin(theta);
+    }
+}
 USHORT RGB16Bit565(int r, int g, int b)
 {
     // this function simply builds a 5.6.5 format 16 bit pixel
