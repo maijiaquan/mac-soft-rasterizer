@@ -19,7 +19,7 @@
 
 //全局变量
 int *framebuffer; //帧缓冲
-ImVec4 clear_color = ImVec4(1.0f, 1.0f, 1.00f, 1.00f);
+ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.00f, 1.00f);
 int display_w, display_h;
 
 POINT4D cam_pos = {0, 0, -100, 1};
@@ -36,6 +36,7 @@ POLYF4DV1 poly1;                    // our lonely polygon
 CAM4DV1 cam;                        // the single camera
 POINT4D poly1_pos = {0, 0, 100, 1}; // world position of polygon
 OBJECT4DV1 obj;                     // used to hold our cube mesh
+    static float x_ang = 0, y_ang = 0, z_ang = 0;
 USHORT(*RGB16Bit)
 (int r, int g, int b) = nullptr;
 void ClearFrame();
@@ -250,7 +251,7 @@ void InitDemo9_2()
 {
     Build_Sin_Cos_Tables();
     // POINT4D cam_pos = {0, 0, 0, 1};
-    POINT4D cam_pos = {105, 0, 13, 1};
+    POINT4D cam_pos = {30, 0, 0, 1};
     POINT4D cam_target = {0, 0, 0, 1};
     VECTOR4D cam_dir = {0, -42, 0, 1};
 
@@ -485,76 +486,44 @@ void DrawDemo9_2()
 
     // } // end else
     Build_CAM4DV1_Matrix_Euler(&cam, CAM_ROT_SEQ_ZYX);
-    static float x_ang = 0, y_ang = 0, z_ang = 0;
 
     Reset_OBJECT4DV2(&obj_constant_water);
-    // set position of constant shaded water
     obj_constant_water.world_pos.x = -50;
     obj_constant_water.world_pos.y = 0;
     obj_constant_water.world_pos.z = 120;
-    // generate rotation matrix around y axis
     Build_XYZ_Rotation_MATRIX4X4(x_ang, y_ang, z_ang, &mrot);
-    // rotate the local coords of the object
     Transform_OBJECT4DV2(&obj_constant_water, &mrot, TRANSFORM_LOCAL_TO_TRANS, 1);
-    // perform world transform
     Model_To_World_OBJECT4DV2(&obj_constant_water, TRANSFORM_TRANS_ONLY);
-    // insert the object into render list
     Insert_OBJECT4DV2_RENDERLIST4DV2(&rend_list2, &obj_constant_water, 0);
 
     Reset_OBJECT4DV2(&obj_constant_light);
-    // set position of constant shaded water
     obj_constant_light.world_pos.x = lights[POINT_LIGHT_INDEX].pos.x;
     obj_constant_light.world_pos.y = lights[POINT_LIGHT_INDEX].pos.y;
     obj_constant_light.world_pos.z = lights[POINT_LIGHT_INDEX].pos.z;
-    // generate rotation matrix around y axis
     Build_XYZ_Rotation_MATRIX4X4(x_ang, y_ang, z_ang, &mrot);
-    // rotate the local coords of the object
     Transform_OBJECT4DV2(&obj_constant_light, &mrot, TRANSFORM_LOCAL_TO_TRANS, 1);
-    // perform world transform
     Model_To_World_OBJECT4DV2(&obj_constant_light, TRANSFORM_TRANS_ONLY);
-    // insert the object into render list
-    Insert_OBJECT4DV2_RENDERLIST4DV2(&rend_list2, &obj_constant_light, 0);
+    // Insert_OBJECT4DV2_RENDERLIST4DV2(&rend_list2, &obj_constant_light, 0);
 
     Reset_OBJECT4DV2(&obj_flat_water);
-    // set position of constant shaded water
     obj_flat_water.world_pos.x = 0;
     obj_flat_water.world_pos.y = 0;
     obj_flat_water.world_pos.z = 120;
-    // generate rotation matrix around y axis
     Build_XYZ_Rotation_MATRIX4X4(x_ang, y_ang, z_ang, &mrot);
-    // rotate the local coords of the object
     Transform_OBJECT4DV2(&obj_flat_water, &mrot, TRANSFORM_LOCAL_TO_TRANS, 1);
-    // perform world transform
     Model_To_World_OBJECT4DV2(&obj_flat_water, TRANSFORM_TRANS_ONLY);
-    // insert the object into render list
-    Insert_OBJECT4DV2_RENDERLIST4DV2(&rend_list2, &obj_flat_water, 0);
+    // Insert_OBJECT4DV2_RENDERLIST4DV2(&rend_list2, &obj_flat_water, 0);
 
-    //////////////////////////////////////////////////////////////////////////
-    // gouraud shaded water
-
-    // reset the object (this only matters for backface and object removal)
     Reset_OBJECT4DV2(&obj_gouraud_water);
-
-    // set position of constant shaded water
     obj_gouraud_water.world_pos.x = 50;
     obj_gouraud_water.world_pos.y = 0;
     obj_gouraud_water.world_pos.z = 120;
-
-    // generate rotation matrix around y axis
     Build_XYZ_Rotation_MATRIX4X4(x_ang, y_ang, z_ang, &mrot);
-
-    // rotate the local coords of the object
     Transform_OBJECT4DV2(&obj_gouraud_water, &mrot, TRANSFORM_LOCAL_TO_TRANS, 1);
-
-    // perform world transform
     Model_To_World_OBJECT4DV2(&obj_gouraud_water, TRANSFORM_TRANS_ONLY);
-    // 丢到了 obj->vlist_trans[vertex].v
-
-    // insert the object into render list
-    Insert_OBJECT4DV2_RENDERLIST4DV2(&rend_list2, &obj_gouraud_water, 0);
+    // Insert_OBJECT4DV2_RENDERLIST4DV2(&rend_list2, &obj_gouraud_water, 0);
 
     RENDERLIST4DV2_PTR rend_list_ptr = &rend_list2;
-    std::cout << rend_list_ptr->num_polys << std::endl;
     // update rotation angles
     // if ((x_ang += 1) > 360)
     // 	x_ang = 0;
@@ -706,15 +675,14 @@ int main(int, char **)
     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f); //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
     //IM_ASSERT(font != NULL);
 
-    bool show_demo_window = true;
+    bool show_demo_window = false;
     bool show_another_window = false;
 
     //    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Main loop
     bool done = false;
-    int tmpCount = 0;
-    cout << "(int)io.DisplaySize.x = " << (int)io.DisplaySize.x << "(int)io.DisplaySize.y = " << (int)io.DisplaySize.y << endl;
+    bool gInited = false;
     while (!done)
     {
 
@@ -751,7 +719,10 @@ int main(int, char **)
             ImGui::Checkbox("Demo Window", &show_demo_window); // Edit bools storing our window open/close state
             ImGui::Checkbox("Another Window", &show_another_window);
 
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);             // Edit 1 float using a slider from 0.0f to 1.0f
+            ImGui::SliderFloat("cam.pos.z", &cam.pos.z, -100.0f, 100.0f);             
+            ImGui::SliderFloat("cam.pos.y", &cam.pos.y, -100.0f, 100.0f);             
+            ImGui::SliderFloat("cam.pos.x", &cam.pos.x, -100.0f, 100.0f);             
+            ImGui::SliderFloat("y_ang", &y_ang, 0.0f, 360.0f);             
             ImGui::ColorEdit3("clear color", (float *)&clear_color); // Edit 3 floats representing a color
 
             if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
@@ -776,17 +747,13 @@ int main(int, char **)
         // Rendering
         ImGui::Render();
         glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-        if (tmpCount < 1)
+        if (!gInited)
         {
             display_w = (int)io.DisplaySize.x;
             display_h = (int)io.DisplaySize.y;
             framebuffer = new int[display_w * display_h];
             InitDemo9_2();
-            // GameInit();
-            tmpCount++;
-            // cout<<"while (int)io.DisplaySize.x = "<<(int)io.DisplaySize.x<<"while (int)io.DisplaySize.y = "<<(int)io.DisplaySize.y<<endl;
-            cout << "h = " << display_h << "w = " << display_w << endl;
-            // cout<<"h = "<<(int)io.DisplaySize.x<<"w = "<<(int)io.DisplaySize.y<<endl;
+            gInited = true;
         }
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
