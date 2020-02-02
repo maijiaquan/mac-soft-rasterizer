@@ -5,6 +5,8 @@
 #include "struct.h"
 #include "parser.h"
 
+#include <iostream>
+using namespace std;
 
 // storage for our lookup tables
 extern float cos_look[361]; // 1 extra so we can store 0-360 inclusive
@@ -19,8 +21,6 @@ extern int num_lights;			   // current number of light
 extern char texture_path[80]; // root path to ALL textures, make current directory for now
 // extern BITMAP_FILE bitmap16bit; // a 16 bit bitmap file
 
-#include <iostream>
-using namespace std;
 
 //颜色转换
 void Color2RGB(const int &hex, int &r, int &g, int &b);
@@ -164,13 +164,6 @@ float VECTOR4D_Dot(VECTOR4D_PTR va, VECTOR4D_PTR vb);
 
 
 
-int Load_OBJECT4DV2_COB(OBJECT4DV2_PTR obj,	// pointer to object
-						char *filename,		   // filename of Caligari COB file
-						VECTOR4D_PTR scale,	// initial scaling factors
-						VECTOR4D_PTR pos,	  // initial position
-						VECTOR4D_PTR rot,	  // initial rotations
-						int vertex_flags = 0); // flags to re-order vertices
-
 
                         // lighting system
 int Init_Light_LIGHTV1(int index,		   // index of light to create (0..MAX_LIGHTS-1)
@@ -226,7 +219,6 @@ void Perspective_To_Screen_RENDERLIST4DV2(RENDERLIST4DV2_PTR rend_list,
 										  CAM4DV1_PTR cam);
 
 int Init_OBJECT4DV2(OBJECT4DV2_PTR obj, int _num_vertices, int _num_polys, int _num_frames, int destroy = 0);
-char *Extract_Filename_From_Path(char *filepath, char *filename);
 
 float Compute_OBJECT4DV2_Radius(OBJECT4DV2_PTR obj);
 

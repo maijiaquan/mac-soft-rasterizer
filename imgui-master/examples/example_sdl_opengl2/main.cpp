@@ -15,6 +15,7 @@
 //#include "string.h"
 #include "ds.h"
 #include "draw.h"
+#include "cobloader.h"
 //using namespace std;
 
 //全局变量
