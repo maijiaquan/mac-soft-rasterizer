@@ -25,7 +25,7 @@ enum RenderType
     PureTriangle
 };
 
-static int multipleChoice = 0;
+static int gRenderType = 0;
 int *framebuffer; //帧缓冲
 ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.00f, 1.00f);
 int display_w, display_h;
@@ -598,11 +598,11 @@ void DrawDemo9_2()
         if ((rend_list_ptr->poly_ptrs[poly]->attr & POLY4DV2_ATTR_SHADE_MODE_FLAT) ||
             (rend_list_ptr->poly_ptrs[poly]->attr & POLY4DV2_ATTR_SHADE_MODE_CONSTANT))
         {
-            if(multipleChoice == PureTriangle)
+            if(gRenderType == PureTriangle)
             {
                 DrawTrianglePureColor2(framebuffer, x1, y1, x2, y2, x3, y3, color);
             }
-            else if(multipleChoice == Wireframe)
+            else if(gRenderType == Wireframe)
             {
                 float x1 = rend_list_ptr->poly_ptrs[poly]->tvlist[0].x;
                 float y1 = rend_list_ptr->poly_ptrs[poly]->tvlist[0].y;
@@ -754,11 +754,11 @@ int main(int, char **)
             ImGui::Checkbox("Demo Window", &show_demo_window); // Edit bools storing our window open/close state
             ImGui::Checkbox("Another Window", &show_another_window);
 
-            ImGui::RadioButton("Wireframe", &multipleChoice, Wireframe);
+            ImGui::RadioButton("Wireframe", &gRenderType, Wireframe);
             ImGui::SameLine();
-            ImGui::RadioButton("PureTriangle", &multipleChoice, PureTriangle);
+            ImGui::RadioButton("PureTriangle", &gRenderType, PureTriangle);
             ImGui::SameLine();
-            ImGui::RadioButton("radio c", &multipleChoice, 2);
+            ImGui::RadioButton("radio c", &gRenderType, 2);
 
             ImGui::SliderFloat("cam.pos.z", &cam.pos.z, -100.0f, 100.0f);             
             ImGui::SliderFloat("cam.pos.y", &cam.pos.y, -100.0f, 100.0f);             
