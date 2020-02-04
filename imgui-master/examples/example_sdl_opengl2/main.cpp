@@ -271,24 +271,25 @@ void InitDemo9_2()
 
     VECTOR4D_INITXYZ(&vscale, 20.00, 20.00, 20.00);
 
-    // Load_OBJECT4DV2_COB(&obj_constant_water, "./cob/water_constant_01.cob",
-    // Load_OBJECT4DV2_COB(&obj_constant_water, "./cob/cube_constant_01.cob",						&vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD);
-    Load_OBJECT4DV2_COB(&obj_constant_water, "./cob/water_flat_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD);
+    //water_flat_01.cob ok
 
-    // load flat shaded water
-    VECTOR4D_INITXYZ(&vscale, 20.00, 20.00, 20.00);
+    Load_OBJECT4DV2_COB(&obj_constant_water, "./cob/water_flat_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD);
+    // Load_OBJECT4DV2_COB(&obj_constant_water, "./cob/water_gouraud_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD);
+    
+                    // load flat shaded water
+                    VECTOR4D_INITXYZ(&vscale, 20.00, 20.00, 20.00);
     // Load_OBJECT4DV2_COB(&obj_flat_water, "./cob/water_gouraud_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD); //修改颜色后的水分子
     Load_OBJECT4DV2_COB(&obj_flat_water, "./cob/water_flat_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD);
 
     // load gouraud shaded water
     VECTOR4D_INITXYZ(&vscale, 20.00, 20.00, 20.00);
     // Load_OBJECT4DV2_COB(&obj_gouraud_water, "./cob/water_flat_01_gouraud.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD); //修改颜色后的水分子
-    Load_OBJECT4DV2_COB(&obj_gouraud_water, "./cob/water_flat_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD);
+    Load_OBJECT4DV2_COB(&obj_gouraud_water, "./cob/water_gouraud_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD);
                                                                                                                                                                                                  //    Load_OBJECT4DV2_COB(&obj_gouraud_water, "./cob/water_gouraud_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD); //修改颜色后的水分子
 
     VECTOR4D_INITXYZ(&vscale, 5.00, 5.00, 5.00);
 
-    Load_OBJECT4DV2_COB(&obj_constant_light, "./cob/cube_flat_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD);
+    Load_OBJECT4DV2_COB(&obj_constant_light, "./cob/water_gouraud_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD);
     Reset_Lights_LIGHTV1();
 
     // create some working colors
@@ -486,40 +487,40 @@ void DrawDemo9_2()
     Build_CAM4DV1_Matrix_Euler(&cam, CAM_ROT_SEQ_ZYX);
 
     Reset_OBJECT4DV2(&obj_constant_water);
-    obj_constant_water.world_pos.x = -50;
-    obj_constant_water.world_pos.y = 0;
+    obj_constant_water.world_pos.x = -150;
+    obj_constant_water.world_pos.y = 20;
     obj_constant_water.world_pos.z = 120;
     Build_XYZ_Rotation_MATRIX4X4(x_ang, y_ang, z_ang, &mrot);
     Transform_OBJECT4DV2(&obj_constant_water, &mrot, TRANSFORM_LOCAL_TO_TRANS, 1);
     Model_To_World_OBJECT4DV2(&obj_constant_water, TRANSFORM_TRANS_ONLY);
     Insert_OBJECT4DV2_RENDERLIST4DV2(&rend_list2, &obj_constant_water, 0);
 
-    Reset_OBJECT4DV2(&obj_constant_light);
-    obj_constant_light.world_pos.x = lights[POINT_LIGHT_INDEX].pos.x;
-    obj_constant_light.world_pos.y = lights[POINT_LIGHT_INDEX].pos.y;
-    obj_constant_light.world_pos.z = lights[POINT_LIGHT_INDEX].pos.z;
-    Build_XYZ_Rotation_MATRIX4X4(x_ang, y_ang, z_ang, &mrot);
-    Transform_OBJECT4DV2(&obj_constant_light, &mrot, TRANSFORM_LOCAL_TO_TRANS, 1);
-    Model_To_World_OBJECT4DV2(&obj_constant_light, TRANSFORM_TRANS_ONLY);
+    // Reset_OBJECT4DV2(&obj_constant_light);
+    // obj_constant_light.world_pos.x = lights[POINT_LIGHT_INDEX].pos.x;
+    // obj_constant_light.world_pos.y = lights[POINT_LIGHT_INDEX].pos.y;
+    // obj_constant_light.world_pos.z = lights[POINT_LIGHT_INDEX].pos.z;
+    // Build_XYZ_Rotation_MATRIX4X4(x_ang, y_ang, z_ang, &mrot);
+    // Transform_OBJECT4DV2(&obj_constant_light, &mrot, TRANSFORM_LOCAL_TO_TRANS, 1);
+    // Model_To_World_OBJECT4DV2(&obj_constant_light, TRANSFORM_TRANS_ONLY);
     // Insert_OBJECT4DV2_RENDERLIST4DV2(&rend_list2, &obj_constant_light, 0);
 
-    Reset_OBJECT4DV2(&obj_flat_water);
-    obj_flat_water.world_pos.x = 0;
-    obj_flat_water.world_pos.y = 0;
-    obj_flat_water.world_pos.z = 120;
-    Build_XYZ_Rotation_MATRIX4X4(x_ang, y_ang, z_ang, &mrot);
-    Transform_OBJECT4DV2(&obj_flat_water, &mrot, TRANSFORM_LOCAL_TO_TRANS, 1);
-    Model_To_World_OBJECT4DV2(&obj_flat_water, TRANSFORM_TRANS_ONLY);
+    // Reset_OBJECT4DV2(&obj_flat_water);
+    // obj_flat_water.world_pos.x = 0;
+    // obj_flat_water.world_pos.y = 0;
+    // obj_flat_water.world_pos.z = 120;
+    // Build_XYZ_Rotation_MATRIX4X4(x_ang, y_ang, z_ang, &mrot);
+    // Transform_OBJECT4DV2(&obj_flat_water, &mrot, TRANSFORM_LOCAL_TO_TRANS, 1);
+    // Model_To_World_OBJECT4DV2(&obj_flat_water, TRANSFORM_TRANS_ONLY);
     // Insert_OBJECT4DV2_RENDERLIST4DV2(&rend_list2, &obj_flat_water, 0);
 
     Reset_OBJECT4DV2(&obj_gouraud_water);
-    obj_gouraud_water.world_pos.x = 50;
+    obj_gouraud_water.world_pos.x = -100;
     obj_gouraud_water.world_pos.y = 0;
     obj_gouraud_water.world_pos.z = 120;
     Build_XYZ_Rotation_MATRIX4X4(x_ang, y_ang, z_ang, &mrot);
     Transform_OBJECT4DV2(&obj_gouraud_water, &mrot, TRANSFORM_LOCAL_TO_TRANS, 1);
     Model_To_World_OBJECT4DV2(&obj_gouraud_water, TRANSFORM_TRANS_ONLY);
-    // Insert_OBJECT4DV2_RENDERLIST4DV2(&rend_list2, &obj_gouraud_water, 0);
+    Insert_OBJECT4DV2_RENDERLIST4DV2(&rend_list2, &obj_gouraud_water, 0);
 
     RENDERLIST4DV2_PTR rend_list_ptr = &rend_list2;
     // update rotation angles
@@ -554,6 +555,7 @@ void DrawDemo9_2()
 
     POLYF4DV2 face; // temp face used to render polygon
 
+    // cout<<rend_list_ptr->num_polys<<endl;
     for (int poly = 0; poly < rend_list_ptr->num_polys; poly++)
     {
         if (!(rend_list_ptr->poly_ptrs[poly]->state & POLY4DV1_STATE_ACTIVE) || (rend_list_ptr->poly_ptrs[poly]->state & POLY4DV1_STATE_CLIPPED) || (rend_list_ptr->poly_ptrs[poly]->state & POLY4DV1_STATE_BACKFACE))
@@ -566,55 +568,54 @@ void DrawDemo9_2()
         float y3 = rend_list_ptr->poly_ptrs[poly]->tvlist[2].y;
 
         int color = rend_list_ptr->poly_ptrs[poly]->lit_color[0];
-        if ((rend_list_ptr->poly_ptrs[poly]->attr & POLY4DV2_ATTR_SHADE_MODE_FLAT) || (rend_list_ptr->poly_ptrs[poly]->attr & POLY4DV2_ATTR_SHADE_MODE_CONSTANT))
+        if (gRenderType == Wireframe)
         {
-            if(gRenderType == PureTriangle)
+            int c;
+            RGB2Color(c, 255, 255, 255);
+            DrawTriangleWireframe(framebuffer, x1, y1, x2, y2, x3, y3, c);
+        }
+        else if (gRenderType == PureTriangle)
+        {
+
+            if ((rend_list_ptr->poly_ptrs[poly]->attr & POLY4DV2_ATTR_SHADE_MODE_FLAT) || (rend_list_ptr->poly_ptrs[poly]->attr & POLY4DV2_ATTR_SHADE_MODE_CONSTANT))
             {
                 DrawTrianglePureColor2(framebuffer, x1, y1, x2, y2, x3, y3, color);
             }
-            else if(gRenderType == Wireframe)
+
+            else if (rend_list_ptr->poly_ptrs[poly]->attr & POLY4DV2_ATTR_SHADE_MODE_GOURAUD)
             {
+                // {andre take advantage of the data structures later..}
+                // set the vertices
+                face.tvlist[0].x = (int)rend_list_ptr->poly_ptrs[poly]->tvlist[0].x;
+                face.tvlist[0].y = (int)rend_list_ptr->poly_ptrs[poly]->tvlist[0].y;
+                face.lit_color[0] = rend_list_ptr->poly_ptrs[poly]->lit_color[0];
 
-                int c;
-                RGB2Color(c, 255, 255, 255);
-                DrawTriangleWireframe(framebuffer, x1, y1, x2, y2, x3, y3, c);
-            }
-            
+                face.tvlist[1].x = (int)rend_list_ptr->poly_ptrs[poly]->tvlist[1].x;
+                face.tvlist[1].y = (int)rend_list_ptr->poly_ptrs[poly]->tvlist[1].y;
+                face.lit_color[1] = rend_list_ptr->poly_ptrs[poly]->lit_color[1];
 
+                face.tvlist[2].x = (int)rend_list_ptr->poly_ptrs[poly]->tvlist[2].x;
+                face.tvlist[2].y = (int)rend_list_ptr->poly_ptrs[poly]->tvlist[2].y;
+                face.lit_color[2] = rend_list_ptr->poly_ptrs[poly]->lit_color[2];
+
+                // draw the gouraud shaded triangle
+                // Draw_Gouraud_Triangle16(&face, video_buffer, lpitch);
+
+                // Draw_Gouraud_Triangle16(&device, &face);
+
+                // DrawPhongTriangle(&device, &cam, &face, rend_list_ptr->poly_ptrs[poly], lights, gF2);
+
+                //     std::cout<<"...tu0 = "<< tu0    <<"tv0 = "<< tv0     <<"tw0 = "<< tw0
+                //  <<"tu1 = "<< tu1     <<"tv1 = "<< tv1     <<"tw1 = "<< tw1
+                //  <<"tu2 = "<< tu2     <<"tv2 = "<< tv2     <<"tw2 = "<< tw2<< std::endl;
+
+                //          std::cout<<"...tpu0 = "<< tpu0    <<"tpv0 = "<< tpv0     <<"tpw0 = "<< tpw0
+                //  <<"tpu1 = "<< tpu1     <<"tpv1 = "<< tpv1     <<"tpw1 = "<< tpw1
+                //  <<"tpu2 = "<< tpu2     <<"tpv2 = "<< tpv2     <<"tpw2 = "<< tpw2<< std::endl;
+
+                // DrawTrianglePureColor2(&device, x1, y1, x2, y2, x3, y3, color);
+            } // end if gouraud
         }
-        else if (rend_list_ptr->poly_ptrs[poly]->attr & POLY4DV2_ATTR_SHADE_MODE_GOURAUD)
-        {
-            // {andre take advantage of the data structures later..}
-            // set the vertices
-            face.tvlist[0].x = (int)rend_list_ptr->poly_ptrs[poly]->tvlist[0].x;
-            face.tvlist[0].y = (int)rend_list_ptr->poly_ptrs[poly]->tvlist[0].y;
-            face.lit_color[0] = rend_list_ptr->poly_ptrs[poly]->lit_color[0];
-
-            face.tvlist[1].x = (int)rend_list_ptr->poly_ptrs[poly]->tvlist[1].x;
-            face.tvlist[1].y = (int)rend_list_ptr->poly_ptrs[poly]->tvlist[1].y;
-            face.lit_color[1] = rend_list_ptr->poly_ptrs[poly]->lit_color[1];
-
-            face.tvlist[2].x = (int)rend_list_ptr->poly_ptrs[poly]->tvlist[2].x;
-            face.tvlist[2].y = (int)rend_list_ptr->poly_ptrs[poly]->tvlist[2].y;
-            face.lit_color[2] = rend_list_ptr->poly_ptrs[poly]->lit_color[2];
-
-            // draw the gouraud shaded triangle
-            // Draw_Gouraud_Triangle16(&face, video_buffer, lpitch);
-
-            // Draw_Gouraud_Triangle16(&device, &face);
-
-            // DrawPhongTriangle(&device, &cam, &face, rend_list_ptr->poly_ptrs[poly], lights, gF2);
-
-            //     std::cout<<"...tu0 = "<< tu0    <<"tv0 = "<< tv0     <<"tw0 = "<< tw0
-            //  <<"tu1 = "<< tu1     <<"tv1 = "<< tv1     <<"tw1 = "<< tw1
-            //  <<"tu2 = "<< tu2     <<"tv2 = "<< tv2     <<"tw2 = "<< tw2<< std::endl;
-
-            //          std::cout<<"...tpu0 = "<< tpu0    <<"tpv0 = "<< tpv0     <<"tpw0 = "<< tpw0
-            //  <<"tpu1 = "<< tpu1     <<"tpv1 = "<< tpv1     <<"tpw1 = "<< tpw1
-            //  <<"tpu2 = "<< tpu2     <<"tpv2 = "<< tpv2     <<"tpw2 = "<< tpw2<< std::endl;
-
-            // DrawTrianglePureColor2(&device, x1, y1, x2, y2, x3, y3, color);
-        } // end if gouraud
     }
 }
 
