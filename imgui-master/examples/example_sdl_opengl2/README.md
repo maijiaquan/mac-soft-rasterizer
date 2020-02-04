@@ -23,7 +23,11 @@ c++ `sdl2-config --cflags` -I .. -I ../.. main.cpp ../imgui_impl_sdl.cpp ../imgu
 brew install sdl2
 c++ `sdl2-config --cflags` -I .. -I ../.. main.cpp ../imgui_impl_sdl.cpp ../imgui_impl_opengl2.cpp ../../imgui*.cpp `sdl2-config --libs` -framework OpenGl
 ```
+2020-02-04 add gouraud
+<img src = "gouraud30.gif">
 
+
+2020-02-02 add flat
 <img src = "1.gif">
 <img src = "1.png">
 <img src = "2.png">
