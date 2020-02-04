@@ -284,7 +284,7 @@ void InitDemo9_2()
     // load gouraud shaded water
     VECTOR4D_INITXYZ(&vscale, 20.00, 20.00, 20.00);
     // Load_OBJECT4DV2_COB(&obj_gouraud_water, "./cob/water_flat_01_gouraud.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD); //修改颜色后的水分子
-    Load_OBJECT4DV2_COB(&obj_gouraud_water, "./cob/water_gouraud_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD);
+    Load_OBJECT4DV2_COB(&obj_gouraud_water, "./cob/water_flat_01_gouraud.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD);
                                                                                                                                                                                                  //    Load_OBJECT4DV2_COB(&obj_gouraud_water, "./cob/water_gouraud_01.cob", &vscale, &vpos, &vrot, VERTEX_FLAGS_SWAP_YZ | VERTEX_FLAGS_TRANSFORM_LOCAL | VERTEX_FLAGS_TRANSFORM_LOCAL_WORLD); //修改颜色后的水分子
 
     VECTOR4D_INITXYZ(&vscale, 5.00, 5.00, 5.00);
@@ -601,6 +601,7 @@ void DrawDemo9_2()
                 // draw the gouraud shaded triangle
                 // Draw_Gouraud_Triangle16(&face, video_buffer, lpitch);
 
+                Draw_Gouraud_Triangle16(framebuffer, &face);
                 // Draw_Gouraud_Triangle16(&device, &face);
 
                 // DrawPhongTriangle(&device, &cam, &face, rend_list_ptr->poly_ptrs[poly], lights, gF2);

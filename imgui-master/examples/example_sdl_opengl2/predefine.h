@@ -14,7 +14,7 @@ typedef unsigned int IUINT32;
 #define INT_MIN (-INT_MAX - 1)
 
 
-#define _RGB565FROM16BIT(RGB, r,g,b) { *r = ( ((RGB) >> 11) & 0x1f); *g = (((RGB) >> 5) & 0x3f); *b = ((RGB) & 0x1f); 
+#define _RGB565FROM16BIT(RGB, r,g,b) { *r = ( ((RGB) >> 11) & 0x1f); *g = (((RGB) >> 5) & 0x3f); *b = ((RGB) & 0x1f); }
 #define _RGB16BIT565(r, g, b) ((b & 31) + ((g & 63) << 5) + ((r & 31) << 11))
 
 #define EPSILON_E3 (float)(1E-3)
@@ -341,3 +341,18 @@ memcpy((void *)(dest_mat), (void *)(src_mat), sizeof(MATRIX4X4)); \
 #define VERTEX_FLAGS_INVERT_TEXTURE_U 0x0080 // invert u texture coordinate
 #define VERTEX_FLAGS_INVERT_TEXTURE_V 0x0100 // invert v texture coordinate
 #define VERTEX_FLAGS_INVERT_SWAP_UV 0x0800   // swap u and v texture coordinate
+
+#define TRI_TYPE_NONE 0
+#define TRI_TYPE_FLAT_TOP 1
+#define TRI_TYPE_FLAT_BOTTOM 2
+#define TRI_TYPE_FLAT_MASK 3
+#define TRI_TYPE_GENERAL 4
+#define INTERP_LHS 0
+#define INTERP_RHS 1
+#define MAX_VERTICES_PER_POLY 6
+
+#define FIXP16_SHIFT 16
+#define FIXP16_MAG 65536
+#define FIXP16_DP_MASK 0x0000ffff
+#define FIXP16_WP_MASK 0xffff0000
+#define FIXP16_ROUND_UP 0x00008000

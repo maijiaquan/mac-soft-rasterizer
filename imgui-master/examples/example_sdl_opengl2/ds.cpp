@@ -47,6 +47,7 @@ void RGB2Color(int &c, const int &r, const int &g, const int &b)
     c = (r << 16) | (g << 8) | b;
 }
 
+
 void Reset_RENDERLIST4DV1(RENDERLIST4DV1_PTR renderList)
 {
     renderList->num_polys = 0;
@@ -3693,10 +3694,19 @@ int Light_RENDERLIST4DV2_World16(RENDERLIST4DV2_PTR rend_list, // list to proces
         // } // end if
 
     } // end for poly
-}
-}
 
 // return success
 return (1);
 
 } // end Light_RENDERLIST4DV2_World16
+
+// //通用函数：从书本的565格式转化为IUINT32格式
+void RGBFrom565(int color, IUINT32 &c)
+{
+	int r, g, b;
+	_RGB565FROM16BIT(color, &r, &g, &b);
+	r <<= 3;
+	g <<= 2;
+	b <<= 3;
+	c = (r<< 16) | (g << 8) | b ;
+}
