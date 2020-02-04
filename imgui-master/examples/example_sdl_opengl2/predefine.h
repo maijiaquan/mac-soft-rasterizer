@@ -24,8 +24,8 @@ typedef unsigned int IUINT32;
 #define FCMP(a,b) ( (fabs(a-b) < EPSILON_E3) ? 1 : 0)
 #define SWAP(a,b,t) {t=a; a=b; b=t;}
 
-#define WINDOW_WIDTH 600 // size of window
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 1000 // size of window
+#define WINDOW_HEIGHT 1000
 
 #define min_clip_x  0 // clipping rectangle
 #define max_clip_x  (WINDOW_WIDTH - 1)
@@ -46,8 +46,8 @@ typedef unsigned int IUINT32;
 #define EPSILON_E5 (float)(1E-5)
 #define EPSILON_E6 (float)(1E-6)
 
-#define WINDOW_WIDTH 400 // size of window
-#define WINDOW_HEIGHT 400
+// #define WINDOW_WIDTH 400 // size of window
+// #define WINDOW_HEIGHT 400
 
 // transformation control flags
 #define TRANSFORM_LOCAL_ONLY 0 // perform the transformation in place on the \

@@ -28,7 +28,7 @@ enum RenderType
 static int gRenderType = 0;
 int *framebuffer; //帧缓冲
 ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.00f, 1.00f);
-int display_w, display_h;
+int display_w, display_h = 2000;
 
 POINT4D cam_pos = {0, 0, -100, 1};
 VECTOR4D cam_dir = {0, 0, 0, 1};
@@ -190,15 +190,17 @@ void DrawFrame();
 void DrawFrame()
 {
 
-    glMatrixMode(GL_PROJECTION);
+    // glMatrixMode(GL_PROJECTION);
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     //        glOrtho(0.0, 500.0, 0.0, 500.0, -1, 1); //设置正射投影的剪裁空间
     //        glOrtho2D(0.0, 500.0, 50 0.0, 0.0);
 
     //        glOrtho2D(0.0, 500.0, 500.0, 0.0);
     //        glOrtho2D(0.0, 500.0, 0.0, 500.0);
+    // glOrtho(0.0, display_w, 0.0, display_h, 0.0, 1.0);
+    // glOrtho(0.0, display_h, 0.0, display_w, 0.0, 1.0);
     glOrtho(0.0, display_w, 0.0, display_h, 0.0, 1.0);
-    //    glOrtho(0.0,display_w,0.0,display_h,0.0,1.0);
 
     glBegin(GL_POINTS);
     float delta = (float)1.0 / 255;
@@ -218,7 +220,7 @@ void DrawFrame()
         // int g = (0xff << 8 & c) >> 8;
         // int b = 0xff & c;
 
-        int r, g, b;
+        int r, g, b = 255;
         // Color2RGB(c, r, g, b);
         for (int j = 0; j < display_w; j++)
         {
@@ -550,38 +552,7 @@ void DrawDemo9_2()
     // apply screen transform
     Perspective_To_Screen_RENDERLIST4DV2(&rend_list2, &cam);
 
-    //  RENDERLIST4DV1_PTR rend_list_ptr = &rend_list;
-
     POLYF4DV2 face; // temp face used to render polygon
-
-    // RENDERLIST4DV1_PTR rend_list_ptr = &rend_list;
-
-    for (int idx_poly = 0; idx_poly < rend_list_ptr->num_polys; idx_poly++)
-    {
-        // std::cout << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[0].x << std::endl;
-        // std::cout << "x1 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[0].x << std::endl;
-        // std::cout << "y1 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[0].y << std::endl;
-        // std::cout << "x2 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[1].x << std::endl;
-        // std::cout << "y2 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[1].y << std::endl;
-        // std::cout << "x3 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[2].x << std::endl;
-        // std::cout << "y3 = " << rend_list_ptr->poly_ptrs[idx_poly]->tvlist[2].y << std::endl;
-        // std::cout << "-----" << std::endl;
-
-        // float x1 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[0].x;
-        // float y1 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[0].y;
-        // float x2 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[1].x;
-        // float y2 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[1].y;
-        // float x3 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[2].x;
-        // float y3 = rend_list_ptr->poly_ptrs[idx_poly]->tvlist[2].y;
-
-        // int c;
-        // RGB2Color(c, 255, 255, 255);
-
-        // device_draw_line(framebuffer,x1, y1, x2, y2, c); //3 1
-        // device_draw_line(framebuffer,x1, y1, x3, y3, c); //3 1
-        // device_draw_line(framebuffer,x2, y2, x3, y3, c); //3 1
-
-    } // end for poly
 
     for (int poly = 0; poly < rend_list_ptr->num_polys; poly++)
     {
@@ -595,8 +566,7 @@ void DrawDemo9_2()
         float y3 = rend_list_ptr->poly_ptrs[poly]->tvlist[2].y;
 
         int color = rend_list_ptr->poly_ptrs[poly]->lit_color[0];
-        if ((rend_list_ptr->poly_ptrs[poly]->attr & POLY4DV2_ATTR_SHADE_MODE_FLAT) ||
-            (rend_list_ptr->poly_ptrs[poly]->attr & POLY4DV2_ATTR_SHADE_MODE_CONSTANT))
+        if ((rend_list_ptr->poly_ptrs[poly]->attr & POLY4DV2_ATTR_SHADE_MODE_FLAT) || (rend_list_ptr->poly_ptrs[poly]->attr & POLY4DV2_ATTR_SHADE_MODE_CONSTANT))
         {
             if(gRenderType == PureTriangle)
             {
@@ -604,19 +574,10 @@ void DrawDemo9_2()
             }
             else if(gRenderType == Wireframe)
             {
-                float x1 = rend_list_ptr->poly_ptrs[poly]->tvlist[0].x;
-                float y1 = rend_list_ptr->poly_ptrs[poly]->tvlist[0].y;
-                float x2 = rend_list_ptr->poly_ptrs[poly]->tvlist[1].x;
-                float y2 = rend_list_ptr->poly_ptrs[poly]->tvlist[1].y;
-                float x3 = rend_list_ptr->poly_ptrs[poly]->tvlist[2].x;
-                float y3 = rend_list_ptr->poly_ptrs[poly]->tvlist[2].y;
 
                 int c;
                 RGB2Color(c, 255, 255, 255);
-
-                device_draw_line(framebuffer, x1, y1, x2, y2, c); //3 1
-                device_draw_line(framebuffer, x1, y1, x3, y3, c); //3 1
-                device_draw_line(framebuffer, x2, y2, x3, y3, c); //3 1
+                DrawTriangleWireframe(framebuffer, x1, y1, x2, y2, x3, y3, c);
             }
             
 
@@ -812,11 +773,9 @@ int main(int, char **)
             }
         }
         DrawDemo9_2();
-
-
         DrawFrame();
 
-        //glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context where shaders may be bound
+        // glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context where shaders may be bound
         ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
     }

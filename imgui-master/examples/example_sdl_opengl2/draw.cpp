@@ -72,6 +72,14 @@ void device_draw_line(int *fb, int x1, int y1, int x2, int y2, int c)
         }
     }
 }
+
+void DrawTriangleWireframe(int *fb, float x1, float y1, float x2, float y2, float x3, float y3, int color)
+{
+    device_draw_line(fb, x1, y1, x2, y2, color); //3 1
+    device_draw_line(fb, x1, y1, x3, y3, color); //3 1
+    device_draw_line(fb, x2, y2, x3, y3, color); //3 1
+}
+
 void DrawDownTrianglePureColor(int *fb, int x1, int y1, int x2, int y2, int x3, int y3, IUINT32 color)
 {
         float dx_right, // the dx/dy ratio of the right edge of line
