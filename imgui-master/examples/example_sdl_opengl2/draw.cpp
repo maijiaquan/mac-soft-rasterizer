@@ -1,11 +1,18 @@
 #include "draw.h"
 
 // void device_pixel(int x, int y, int c);
-void device_pixel(int *fb, int x, int y, int c)
+void device_pixel(int *fb, const int &x, const int &y, const int &c)
 // void device_pixel(int x, int y, int c)
 {
     // framebuffer[y * display_w + x] = c;
     fb[y * display_w + x] = c;
+}
+
+void device_pixel(int *fb, const int &x, const int &y, const int &r, const int &g, const int &b)
+{
+    int c;
+    RGB2Color(c, r, g, b);
+    device_pixel(fb, x, y, c);
 }
 
 void device_draw_line(int *fb, int x1, int y1, int x2, int y2, int c)

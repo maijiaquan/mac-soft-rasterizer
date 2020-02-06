@@ -10,7 +10,8 @@ extern int display_w, display_h;
 extern int *framebuffer; 
 
 //绘制像素点
-void device_pixel(int *fb, int x, int y, int c); 
+void device_pixel(int *fb, const int &x, const int &y, const int &c);
+void device_pixel(int *fb, const int &x, const int &y, const int &r, const int &g, const int &b);
 
 //绘制一条纯色线
 void device_draw_line(int *fb, int x1, int y1, int x2, int y2, int c); 

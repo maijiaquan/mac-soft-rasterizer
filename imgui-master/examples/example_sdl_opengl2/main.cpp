@@ -633,6 +633,7 @@ hitable *random_scene();
 void RayTracing();
 
 vec3 color(const ray& r, hitable *world, int depth) {
+    
     hit_record rec;
     if (world->hit(r, 0.001, MAXFLOAT, rec)) {
         ray scattered;
@@ -650,15 +651,22 @@ vec3 color(const ray& r, hitable *world, int depth) {
         return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
     }
 }
-
+vec3 color(const ray& r) {
+    vec3 unit_direction = unit_vector(r.direction());
+    float t = 0.5*(unit_direction.y() + 1.0);
+    return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
+}
 
 hitable *random_scene() {
     int n = 500;
+    // int n = 50;
     hitable **list = new hitable*[n+1];
     list[0] =  new sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5, 0.5, 0.5)));
     int i = 1;
-    for (int a = -11; a < 11; a++) {
-        for (int b = -11; b < 11; b++) {
+    // for (int a = -11; a < 11; a++) {
+    for (int a = -2; a < 2; a++) {
+        // for (int b = -11; b < 11; b++) {
+        for (int b = -2; b < 2; b++) {
             float choose_mat = random_double();
             vec3 center(a+0.9*random_double(),0.2,b+0.9*random_double());
             if ((center-vec3(4,0.2,0)).length() > 0.9) {
@@ -695,10 +703,33 @@ hitable *random_scene() {
 
 
 void RayTracing() {
-    // int nx = 1200;
-    // int ny = 800;
-    int nx = 1000;
+    int nx = 1200;
     int ny = 600;
+    // int nx = 200;
+    // int ny = 100;
+    std::cout << "P3\n" << nx << " " << ny << "\n255\n";
+    vec3 lower_left_corner(-2.0, -1.0, -1.0);
+    vec3 horizontal(4.0, 0.0, 0.0);
+    vec3 vertical(0.0, 2.0, 0.0);
+    vec3 origin(0.0, 0.0, 0.0);
+    for (int j = ny-1; j >= 0; j--) {
+        for (int i = 0; i < nx; i++) {
+            float u = float(i) / float(nx);
+            float v = float(j) / float(ny);
+            ray r(origin, lower_left_corner + u*horizontal + v*vertical);
+            vec3 col = color(r);
+            int ir = int(255.99*col[0]);
+            int ig = int(255.99*col[1]);
+            int ib = int(255.99*col[2]);
+
+            device_pixel(framebuffer, i, ny - 1 - j, ir, ig, ib);
+            std::cout << ir << " " << ig << " " << ib << "\n";
+        }
+    }
+    return;
+
+    // int nx = 1000;
+    // int ny = 600;
     int ns = 100;
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 
@@ -711,8 +742,9 @@ void RayTracing() {
 
     camera cam(lookfrom, lookat, vec3(0,1,0), 20, float(nx)/float(ny), aperture, dist_to_focus);
 
+
     for (int j = ny-1; j >= 0; j--) {
-        cout<<"j = "<<j<<endl;
+        // cout<<"j = "<<j<<endl;
         for (int i = 0; i < nx; i++) {
                     // cout<<"i = "<<i<<endl;
 
@@ -730,10 +762,7 @@ void RayTracing() {
             int ig = int(255.99*col[1]);
             int ib = int(255.99*col[2]);
 
-
-                    int c;
-                    RGB2Color(c, ir, ig, ib);
-            device_pixel(framebuffer, i, ny-1-j,c ); 
+            device_pixel(framebuffer, i, ny - 1 - j, ir, ig, ib);
             // std::cout << "xxx "<< ir << " " << ig << " " << ib << "\n";
         }
     }
