@@ -19,12 +19,12 @@
 //using namespace std;
 
 
-#include "sphere.h"
-#include "hitable_list.h"
-#include "float.h"
-#include "camera.h"
-#include "material.h"
-#include "random.h"
+// #include "sphere.h"
+// #include "hitable_list.h"
+// #include "float.h"
+// #include "camera.h"
+// #include "material.h"
+// #include "random.h"
 #include <thread>
 //全局变量
 enum RenderType
@@ -628,83 +628,134 @@ void DrawDemo9_2()
     }
 }
 
-vec3 color(const ray &r, hitable *world, int depth);
-hitable *random_scene();
+// vec3 color(const ray &r, hitable *world, int depth);
+// hitable *random_scene();
+
+// vec3 color(const ray& r, hitable *world, int depth) {
+    
+//     hit_record rec;
+//     if (world->hit(r, 0.001, MAXFLOAT, rec)) {
+//         ray scattered;
+//         vec3 attenuation;
+//         if (depth < 50 && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
+//              return attenuation*color(scattered, world, depth+1);
+//         }
+//         else {
+//             return vec3(0,0,0);
+//         }
+//     }
+//     else {
+//         vec3 unit_direction = unit_vector(r.direction());
+//         float t = 0.5*(unit_direction.y() + 1.0);
+//         return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
+//     }
+// }
+
+
+// hitable *random_scene() {
+//     int n = 500;
+//     // int n = 50;
+//     hitable **list = new hitable*[n+1];
+//     list[0] =  new sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5, 0.5, 0.5)));
+//     int i = 1;
+//     // for (int a = -11; a < 11; a++) {
+//     for (int a = -2; a < 2; a++) {
+//         // for (int b = -11; b < 11; b++) {
+//         for (int b = -2; b < 2; b++) {
+//             float choose_mat = random_double();
+//             vec3 center(a+0.9*random_double(),0.2,b+0.9*random_double());
+//             if ((center-vec3(4,0.2,0)).length() > 0.9) {
+//                 if (choose_mat < 0.8) {  // diffuse
+//                     list[i++] = new sphere(
+//                         center, 0.2,
+//                         new lambertian(vec3(random_double()*random_double(),
+//                                             random_double()*random_double(),
+//                                             random_double()*random_double()))
+//                     );
+//                 }
+//                 else if (choose_mat < 0.95) { // metal
+//                     list[i++] = new sphere(
+//                         center, 0.2,
+//                         new metal(vec3(0.5*(1 + random_double()),
+//                                        0.5*(1 + random_double()),
+//                                        0.5*(1 + random_double())),
+//                                   0.5*random_double())
+//                     );
+//                 }
+//                 else {  // glass
+//                     list[i++] = new sphere(center, 0.2, new dielectric(1.5));
+//                 }
+//             }
+//         }
+//     }
+
+//     list[i++] = new sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5));
+//     list[i++] = new sphere(vec3(-4, 1, 0), 1.0, new lambertian(vec3(0.4, 0.2, 0.1)));
+//     list[i++] = new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0));
+//     return new hitable_list(list,i);
+
+// }
+
+// vec3 color(const ray& r) {
+//     vec3 unit_direction = unit_vector(r.direction());
+//     float t = 0.5*(unit_direction.y() + 1.0);
+//     return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
+//     // return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.0, 0.0, 0.0);
+//     // return (1.0-t)*vec3(1.0, 0.0, 0.0) + t*vec3(0.0, 1.0, 0.0);
+// }
+#include <unistd.h>
+
+#include "vec3.h"
 void RayTracing();
 
-vec3 color(const ray& r, hitable *world, int depth) {
-    
-    hit_record rec;
-    if (world->hit(r, 0.001, MAXFLOAT, rec)) {
-        ray scattered;
-        vec3 attenuation;
-        if (depth < 50 && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
-             return attenuation*color(scattered, world, depth+1);
-        }
-        else {
-            return vec3(0,0,0);
-        }
+class ray
+{
+    public:
+        ray() {}
+        ray(const vec3& a, const vec3& b) { A = a; B = b; }
+        vec3 origin() const       { return A; }
+        vec3 direction() const    { return B; }
+        vec3 point_at_parameter(float t) const { return A + t*B; }
+
+        vec3 A;
+        vec3 B;
+};
+
+
+float hit_sphere(const vec3& center, float radius, const ray& r) {
+    vec3 oc = r.origin() - center;
+    float a = dot(r.direction(), r.direction());
+    float b = 2.0 * dot(oc, r.direction());
+    float c = dot(oc, oc) - radius*radius;
+    float discriminant = b*b - 4*a*c;
+    if (discriminant < 0) {
+        return -1.0;
     }
     else {
-        vec3 unit_direction = unit_vector(r.direction());
-        float t = 0.5*(unit_direction.y() + 1.0);
-        return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
+        return (-b - sqrt(discriminant) ) / (2.0*a);
     }
 }
+
 vec3 color(const ray& r) {
+    float t = hit_sphere(vec3(0,0,-1), 0.5, r);
+    if (t > 0.0) {
+        vec3 N = unit_vector(r.point_at_parameter(t) - vec3(0,0,-1));
+        return 0.5*vec3(N.x()+1, N.y()+1, N.z()+1);
+    }
     vec3 unit_direction = unit_vector(r.direction());
-    float t = 0.5*(unit_direction.y() + 1.0);
+    t = 0.5*(unit_direction.y() + 1.0);
     return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
 }
 
-hitable *random_scene() {
-    int n = 500;
-    // int n = 50;
-    hitable **list = new hitable*[n+1];
-    list[0] =  new sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5, 0.5, 0.5)));
-    int i = 1;
-    // for (int a = -11; a < 11; a++) {
-    for (int a = -2; a < 2; a++) {
-        // for (int b = -11; b < 11; b++) {
-        for (int b = -2; b < 2; b++) {
-            float choose_mat = random_double();
-            vec3 center(a+0.9*random_double(),0.2,b+0.9*random_double());
-            if ((center-vec3(4,0.2,0)).length() > 0.9) {
-                if (choose_mat < 0.8) {  // diffuse
-                    list[i++] = new sphere(
-                        center, 0.2,
-                        new lambertian(vec3(random_double()*random_double(),
-                                            random_double()*random_double(),
-                                            random_double()*random_double()))
-                    );
-                }
-                else if (choose_mat < 0.95) { // metal
-                    list[i++] = new sphere(
-                        center, 0.2,
-                        new metal(vec3(0.5*(1 + random_double()),
-                                       0.5*(1 + random_double()),
-                                       0.5*(1 + random_double())),
-                                  0.5*random_double())
-                    );
-                }
-                else {  // glass
-                    list[i++] = new sphere(center, 0.2, new dielectric(1.5));
-                }
-            }
-        }
-    }
-
-    list[i++] = new sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5));
-    list[i++] = new sphere(vec3(-4, 1, 0), 1.0, new lambertian(vec3(0.4, 0.2, 0.1)));
-    list[i++] = new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0));
-    return new hitable_list(list,i);
-
-}
-
+float progressIdx = 0.0f, progressDir = 1.0f;
 
 void RayTracing() {
-    int nx = 1200;
-    int ny = 600;
+    usleep(1000); // will sleep for 1 ms
+    usleep(1); // will sleep for 0.001 ms
+    usleep(1000000); // will sleep for 1 s
+    usleep(1000000); // will sleep for 1 s
+    int nx = 800;
+    int ny = 400;
     // int nx = 200;
     // int ny = 100;
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
@@ -713,6 +764,7 @@ void RayTracing() {
     vec3 vertical(0.0, 2.0, 0.0);
     vec3 origin(0.0, 0.0, 0.0);
     for (int j = ny-1; j >= 0; j--) {
+        progressIdx = float(ny-1-j)/(ny-1);
         for (int i = 0; i < nx; i++) {
             float u = float(i) / float(nx);
             float v = float(j) / float(ny);
@@ -727,46 +779,47 @@ void RayTracing() {
         }
     }
     return;
+}
 
     // int nx = 1000;
     // int ny = 600;
-    int ns = 100;
-    std::cout << "P3\n" << nx << " " << ny << "\n255\n";
+    // int ns = 100;
+    // std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 
-    vec3 lookfrom(13,2,3);
-    vec3 lookat(0,0,0);
-    float dist_to_focus = 10.0;
-    float aperture = 0.1;
-    hitable *world = random_scene();
-
-
-    camera cam(lookfrom, lookat, vec3(0,1,0), 20, float(nx)/float(ny), aperture, dist_to_focus);
+    // vec3 lookfrom(13,2,3);
+    // vec3 lookat(0,0,0);
+    // float dist_to_focus = 10.0;
+    // float aperture = 0.1;
+    // hitable *world = random_scene();
 
 
-    for (int j = ny-1; j >= 0; j--) {
-        // cout<<"j = "<<j<<endl;
-        for (int i = 0; i < nx; i++) {
-                    // cout<<"i = "<<i<<endl;
+    // camera cam(lookfrom, lookat, vec3(0,1,0), 20, float(nx)/float(ny), aperture, dist_to_focus);
 
-            vec3 col(0, 0, 0);
-            for (int s=0; s < ns; s++) {
-                // cout<<"s = "<<s<<endl;
-                float u = float(i + random_double()) / float(nx);
-                float v = float(j + random_double()) / float(ny);
-                ray r = cam.get_ray(u, v);
-                col += color(r, world,0);
-            }
-            col /= float(ns);
-            col = vec3( sqrt(col[0]), sqrt(col[1]), sqrt(col[2]) );
-            int ir = int(255.99*col[0]);
-            int ig = int(255.99*col[1]);
-            int ib = int(255.99*col[2]);
 
-            device_pixel(framebuffer, i, ny - 1 - j, ir, ig, ib);
-            // std::cout << "xxx "<< ir << " " << ig << " " << ib << "\n";
-        }
-    }
-}
+    // for (int j = ny-1; j >= 0; j--) {
+    //     // cout<<"j = "<<j<<endl;
+    //     for (int i = 0; i < nx; i++) {
+    //                 // cout<<"i = "<<i<<endl;
+
+    //         vec3 col(0, 0, 0);
+    //         for (int s=0; s < ns; s++) {
+    //             // cout<<"s = "<<s<<endl;
+    //             float u = float(i + random_double()) / float(nx);
+    //             float v = float(j + random_double()) / float(ny);
+    //             ray r = cam.get_ray(u, v);
+    //             col += color(r, world,0);
+    //         }
+    //         col /= float(ns);
+    //         col = vec3( sqrt(col[0]), sqrt(col[1]), sqrt(col[2]) );
+    //         int ir = int(255.99*col[0]);
+    //         int ig = int(255.99*col[1]);
+    //         int ib = int(255.99*col[2]);
+
+    //         device_pixel(framebuffer, i, ny - 1 - j, ir, ig, ib);
+    //         // std::cout << "xxx "<< ir << " " << ig << " " << ib << "\n";
+    //     }
+    // }
+// }
 
 
 int main(int, char **)
@@ -887,8 +940,29 @@ int main(int, char **)
             ImGui::SameLine();
             ImGui::Text("counter = %d", counter);
 
+                    // Animate a simple progress bar
+            // if (true)
+            // {
+            //     progressIdx += progressDir * 0.4f * ImGui::GetIO().DeltaTime;
+            //     if (progressIdx >= +1.1f)
+            //     {
+            //         progressIdx = +1.1f;
+            //         progressDir *= -1.0f;
+            //     }
+            //     if (progressIdx <= -0.1f)
+            //     {
+            //         progressIdx = -0.1f;
+            //         progressDir *= -1.0f;
+            //     }
+            // }
+
+            // Typically we would use ImVec2(-1.0f,0.0f) to use all available width, or ImVec2(width,0.0f) for a specified width. ImVec2(0.0f,0.0f) uses ItemWidth.
+            ImGui::ProgressBar(progressIdx, ImVec2(0.0f, 0.0f));
+            ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+            ImGui::Text("Progress Bar");
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::End();
+
         }
 
         // 3. Show another simple window.
@@ -931,6 +1005,7 @@ int main(int, char **)
             }
         }
         // DrawDemo9_2();
+        // RayTracing();
         DrawFrame();
 
 
