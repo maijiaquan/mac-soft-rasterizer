@@ -704,8 +704,21 @@ void DrawDemo9_2()
 //     // return (1.0-t)*vec3(1.0, 0.0, 0.0) + t*vec3(0.0, 1.0, 0.0);
 // }
 
+/*
+本次改动
+1.显示逻辑封装成camera
+2.增加random函数
+3.在一个像素里面重复随机采样100次，实现抗锯齿
+4.使用fstream导出图片成ppm格式
+*/
 #include <unistd.h>
 #include "vec3.h"
+#include <cstdlib>
+inline double random_double() {
+    return rand() / (RAND_MAX + 1.0);
+}
+
+
 float progressIdx = 0.0f, progressDir = 1.0f;
 
 class ray
@@ -823,50 +836,86 @@ vec3 color(const ray &r, hittable *world)
     }
 }
 
-void RayTracing() {
-    usleep(1000); // will sleep for 1 ms
-    usleep(1); // will sleep for 0.001 ms
-    // usleep(1000000); // will sleep for 1 s
-    // usleep(1000000); // will sleep for 1 s
-    int nx = 600;
-    int ny = 300;
+class camera
+{
+public:
+    vec3 origin;
+    vec3 lower_left_corner;
+    vec3 horizontal;
+    vec3 vertical;
+
+    camera()
+    {
+        lower_left_corner = vec3(-2.0, -1.0, -1.0);
+        horizontal = vec3(4.0, 0.0, 0.0);
+        vertical = vec3(0.0, 2.0, 0.0);
+        origin = vec3(0.0, 0.0, 0.0);
+    }
+
+    ray get_ray(float u, float v)
+    {
+        return ray(origin,
+                   lower_left_corner + u * horizontal + v * vertical - origin);
+    }
+
+};
+#include <fstream>
+void RayTracing()
+{
+    usleep(1000);    // will sleep for 1 ms
+    usleep(1);       // will sleep for 0.001 ms
+    usleep(1000000); // will sleep for 1 s
+                     // usleep(1000000); // will sleep for 1 s
+                     // int nx = 600;
+                     // int ny = 300;
+    int ns = 100;
+
+    int nx = 800;
+    int ny = 400;
     // int nx = 200;
     // int ny = 100;
-    std::cout << "P3\n" << nx << " " << ny << "\n255\n";
+    std::cout << "P3\n"
+              << nx << " " << ny << "\n255\n";
     vec3 lower_left_corner(-2.0, -1.0, -1.0);
     vec3 horizontal(4.0, 0.0, 0.0);
     vec3 vertical(0.0, 2.0, 0.0);
     vec3 origin(0.0, 0.0, 0.0);
 
     hittable *list[2];
-    list[0] = new sphere(vec3(0,0,-1), 0.5);
-    list[1] = new sphere(vec3(0,-100.5,-1), 100);
-    hittable *world = new hittable_list(list,2);
+    list[0] = new sphere(vec3(0, 0, -1), 0.5);
+    list[1] = new sphere(vec3(0, -100.5, -1), 100);
+    hittable *world = new hittable_list(list, 2);
+    camera cam;
+    ofstream rst("output_" + to_string(nx) + "x" + to_string(ny) + ".ppm");
+    rst << "P3\n"
+        << nx << " " << ny << "\n255\n";
+    for (int j = ny - 1; j >= 0; j--)
+    {
+        progressIdx = float(ny - 1 - j) / (ny - 1);
+        for (int i = 0; i < nx; i++)
+        {
 
-    for (int j = ny-1; j >= 0; j--) {
-        progressIdx = float(ny-1-j)/(ny-1);
-        for (int i = 0; i < nx; i++) {
-            float u = float(i) / float(nx);
-            float v = float(j) / float(ny);
-            ray r(origin, lower_left_corner + u*horizontal + v*vertical);
-
-            vec3 p = r.point_at_parameter(2.0);
-            vec3 col = color(r, world);
-
-            // vec3 col = color(r);
-            int ir = int(255.99*col[0]);
-            int ig = int(255.99*col[1]);
-            int ib = int(255.99*col[2]);
+            vec3 col(0, 0, 0);
+            for (int s = 0; s < ns; s++)
+            {
+                float u = float(i + random_double()) / float(nx);
+                float v = float(j + random_double()) / float(ny);
+                ray r = cam.get_ray(u, v);
+                col += color(r, world);
+            }
+            col /= float(ns);
+            int ir = int(255.99 * col[0]);
+            int ig = int(255.99 * col[1]);
+            int ib = int(255.99 * col[2]);
 
             device_pixel(framebuffer, i, ny - 1 - j, ir, ig, ib);
             std::cout << ir << " " << ig << " " << ib << "\n";
+            rst << ir << " " << ig << " " << ib << endl;
+            // rst << icolor.r << " " << icolor.g << " " << icolor.b << endl;
         }
     }
     return;
 }
-
-
-
 
 int main(int, char **)
 {
