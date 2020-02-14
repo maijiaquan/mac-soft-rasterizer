@@ -703,9 +703,11 @@ void DrawDemo9_2()
 //     // return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.0, 0.0, 0.0);
 //     // return (1.0-t)*vec3(1.0, 0.0, 0.0) + t*vec3(0.0, 1.0, 0.0);
 // }
-#include <unistd.h>
 
+#include <unistd.h>
 #include "vec3.h"
+float progressIdx = 0.0f, progressDir = 1.0f;
+
 void RayTracing();
 
 class ray
@@ -715,15 +717,14 @@ class ray
         ray(const vec3& a, const vec3& b) { A = a; B = b; }
         vec3 origin() const       { return A; }
         vec3 direction() const    { return B; }
-        vec3 point_at_parameter(float t) const { return A + t*B; }
+        vec3 point_at_parameter(float t) const { return A + t*B; } //终点的坐标
 
         vec3 A;
         vec3 B;
 };
 
-
 float hit_sphere(const vec3& center, float radius, const ray& r) {
-    vec3 oc = r.origin() - center;
+    vec3 oc = r.origin() - center; //A-C
     float a = dot(r.direction(), r.direction());
     float b = 2.0 * dot(oc, r.direction());
     float c = dot(oc, oc) - radius*radius;
@@ -736,28 +737,35 @@ float hit_sphere(const vec3& center, float radius, const ray& r) {
     }
 }
 
+
 vec3 color(const ray& r) {
-    float t = hit_sphere(vec3(0,0,-1), 0.5, r);
-    if (t > 0.0) {
-        vec3 N = unit_vector(r.point_at_parameter(t) - vec3(0,0,-1));
-        return 0.5*vec3(N.x()+1, N.y()+1, N.z()+1);
+    vec3 center = vec3(0,0,-1);
+    float radius = 0.5;
+
+    float t = hit_sphere(center, radius, r);
+    if (t > 0.0) //有实数根
+    {
+        vec3 N = r.point_at_parameter(t) - center;
+        N = unit_vector(N); //单位向量
+        return 0.5 * (N + vec3(1, 1, 1));   //[-1,1] -> [0,1]
+        // return 0.5 * vec3(N.y() + 1, N.y() + 1, N.y() + 1);   //[-1,1] -> [0,1]
     }
     vec3 unit_direction = unit_vector(r.direction());
-    t = 0.5*(unit_direction.y() + 1.0);
-    return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
+    t = 0.5 * (unit_direction.y() + 1.0);
+    return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
 }
 
-float progressIdx = 0.0f, progressDir = 1.0f;
+
 
 void RayTracing() {
     usleep(1000); // will sleep for 1 ms
     usleep(1); // will sleep for 0.001 ms
     usleep(1000000); // will sleep for 1 s
     usleep(1000000); // will sleep for 1 s
-    int nx = 800;
-    int ny = 400;
-    // int nx = 200;
-    // int ny = 100;
+    // int nx = 800;
+    // int ny = 400;
+    int nx = 200;
+    int ny = 100;
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
     vec3 lower_left_corner(-2.0, -1.0, -1.0);
     vec3 horizontal(4.0, 0.0, 0.0);
@@ -781,45 +789,7 @@ void RayTracing() {
     return;
 }
 
-    // int nx = 1000;
-    // int ny = 600;
-    // int ns = 100;
-    // std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 
-    // vec3 lookfrom(13,2,3);
-    // vec3 lookat(0,0,0);
-    // float dist_to_focus = 10.0;
-    // float aperture = 0.1;
-    // hitable *world = random_scene();
-
-
-    // camera cam(lookfrom, lookat, vec3(0,1,0), 20, float(nx)/float(ny), aperture, dist_to_focus);
-
-
-    // for (int j = ny-1; j >= 0; j--) {
-    //     // cout<<"j = "<<j<<endl;
-    //     for (int i = 0; i < nx; i++) {
-    //                 // cout<<"i = "<<i<<endl;
-
-    //         vec3 col(0, 0, 0);
-    //         for (int s=0; s < ns; s++) {
-    //             // cout<<"s = "<<s<<endl;
-    //             float u = float(i + random_double()) / float(nx);
-    //             float v = float(j + random_double()) / float(ny);
-    //             ray r = cam.get_ray(u, v);
-    //             col += color(r, world,0);
-    //         }
-    //         col /= float(ns);
-    //         col = vec3( sqrt(col[0]), sqrt(col[1]), sqrt(col[2]) );
-    //         int ir = int(255.99*col[0]);
-    //         int ig = int(255.99*col[1]);
-    //         int ib = int(255.99*col[2]);
-
-    //         device_pixel(framebuffer, i, ny - 1 - j, ir, ig, ib);
-    //         // std::cout << "xxx "<< ir << " " << ig << " " << ib << "\n";
-    //     }
-    // }
-// }
 
 
 int main(int, char **)
