@@ -886,8 +886,8 @@ void RayTracing()
     list[1] = new sphere(vec3(0, -100.5, -1), 100);
     hittable *world = new hittable_list(list, 2);
     camera cam;
-    ofstream rst("output_" + to_string(nx) + "x" + to_string(ny) + ".ppm");
-    rst << "P3\n"
+    ofstream outFile("output_" + to_string(nx) + "x" + to_string(ny) + ".ppm");
+    outFile << "P3\n"
         << nx << " " << ny << "\n255\n";
     for (int j = ny - 1; j >= 0; j--)
     {
@@ -910,8 +910,8 @@ void RayTracing()
 
             device_pixel(framebuffer, i, ny - 1 - j, ir, ig, ib);
             std::cout << ir << " " << ig << " " << ib << "\n";
-            rst << ir << " " << ig << " " << ib << endl;
-            // rst << icolor.r << " " << icolor.g << " " << icolor.b << endl;
+            outFile << ir << " " << ig << " " << ib << endl;
+            // outFile << icolor.r << " " << icolor.g << " " << icolor.b << endl;
         }
     }
     return;
