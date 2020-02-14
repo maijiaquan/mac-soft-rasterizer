@@ -708,76 +708,152 @@ void DrawDemo9_2()
 #include "vec3.h"
 float progressIdx = 0.0f, progressDir = 1.0f;
 
-void RayTracing();
-
 class ray
 {
-    public:
-        ray() {}
-        ray(const vec3& a, const vec3& b) { A = a; B = b; }
-        vec3 origin() const       { return A; }
-        vec3 direction() const    { return B; }
-        vec3 point_at_parameter(float t) const { return A + t*B; } //终点的坐标
+public:
+    ray() {}
+    ray(const vec3 &a, const vec3 &b)
+    {
+        A = a;
+        B = b;
+    }
+    vec3 origin() const { return A; }
+    vec3 direction() const { return B; }
+    vec3 point_at_parameter(float t) const { return A + t * B; } //终点的坐标
 
-        vec3 A;
-        vec3 B;
+    vec3 A;
+    vec3 B;
 };
 
-float hit_sphere(const vec3& center, float radius, const ray& r) {
-    vec3 oc = r.origin() - center; //A-C
-    float a = dot(r.direction(), r.direction());
-    float b = 2.0 * dot(oc, r.direction());
-    float c = dot(oc, oc) - radius*radius;
-    float discriminant = b*b - 4*a*c;
-    if (discriminant < 0) {
-        return -1.0;
-    }
-    else {
-        return (-b - sqrt(discriminant) ) / (2.0*a);
-    }
-}
+struct hit_record
+{
+    float t;
+    vec3 p;
+    vec3 normal;
+};
 
+class hittable
+{
+public:
+    virtual bool hit(
+        const ray &r, float t_min, float t_max, hit_record &rec) const = 0;
+};
 
-vec3 color(const ray& r) {
-    vec3 center = vec3(0,0,-1);
-    float radius = 0.5;
+class sphere : public hittable
+{
+public:
+    sphere() {}
+    sphere(vec3 center, float r) : center(center), radius(r){};
+    vec3 center;
+    float radius;
 
-    float t = hit_sphere(center, radius, r);
-    if (t > 0.0) //有实数根
+    virtual bool hit(const ray &r, float t_min, float t_max, hit_record &rec) const
     {
-        vec3 N = r.point_at_parameter(t) - center;
-        N = unit_vector(N); //单位向量
-        return 0.5 * (N + vec3(1, 1, 1));   //[-1,1] -> [0,1]
-        // return 0.5 * vec3(N.y() + 1, N.y() + 1, N.y() + 1);   //[-1,1] -> [0,1]
+        vec3 oc = r.origin() - center;
+        float a = dot(r.direction(), r.direction());
+        float b = dot(oc, r.direction());
+        float c = dot(oc, oc) - radius * radius;
+        float discriminant = b * b - a * c;
+        if (discriminant > 0)
+        {
+            float temp = (-b - sqrt(discriminant)) / a; //小根
+            if (temp < t_max && temp > t_min)
+            {
+                rec.t = temp;
+                rec.p = r.point_at_parameter(rec.t);
+                rec.normal = (rec.p - center) / radius;
+                return true;
+            }
+            temp = (-b + sqrt(discriminant)) / a; //大根
+            if (temp < t_max && temp > t_min)
+            {
+                rec.t = temp;
+                rec.p = r.point_at_parameter(rec.t);
+                rec.normal = (rec.p - center) / radius;
+                return true;
+            }
+        }
+        return false;
     }
-    vec3 unit_direction = unit_vector(r.direction());
-    t = 0.5 * (unit_direction.y() + 1.0);
-    return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
+};
+
+class hittable_list : public hittable
+{
+public:
+    hittable **list;
+    int list_size;
+
+    hittable_list() {}
+    hittable_list(hittable **l, int n)
+    {
+        list = l;
+        list_size = n;
+    }
+    virtual bool hit(const ray &r, float t_min, float t_max, hit_record &rec) const
+    {
+
+        hit_record temp_rec;
+        bool hit_anything = false;
+        double closest_so_far = t_max;
+        for (int i = 0; i < list_size; i++)
+        {
+            if (list[i]->hit(r, t_min, closest_so_far, temp_rec))
+            {
+                hit_anything = true;
+                closest_so_far = temp_rec.t;
+                rec = temp_rec; //只记录打到的最近的球
+            }
+        }
+        return hit_anything;
+    }
+};
+
+vec3 color(const ray &r, hittable *world)
+{
+    hit_record rec;
+    if (world->hit(r, 0.0, MAXFLOAT, rec))
+    {
+        return 0.5 * vec3(rec.normal.x() + 1, rec.normal.y() + 1, rec.normal.z() + 1);
+    }
+    else
+    {
+        vec3 unit_direction = unit_vector(r.direction());
+        float t = 0.5 * (unit_direction.y() + 1.0);
+        return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
+    }
 }
-
-
 
 void RayTracing() {
     usleep(1000); // will sleep for 1 ms
     usleep(1); // will sleep for 0.001 ms
-    usleep(1000000); // will sleep for 1 s
-    usleep(1000000); // will sleep for 1 s
-    // int nx = 800;
-    // int ny = 400;
-    int nx = 200;
-    int ny = 100;
+    // usleep(1000000); // will sleep for 1 s
+    // usleep(1000000); // will sleep for 1 s
+    int nx = 600;
+    int ny = 300;
+    // int nx = 200;
+    // int ny = 100;
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
     vec3 lower_left_corner(-2.0, -1.0, -1.0);
     vec3 horizontal(4.0, 0.0, 0.0);
     vec3 vertical(0.0, 2.0, 0.0);
     vec3 origin(0.0, 0.0, 0.0);
+
+    hittable *list[2];
+    list[0] = new sphere(vec3(0,0,-1), 0.5);
+    list[1] = new sphere(vec3(0,-100.5,-1), 100);
+    hittable *world = new hittable_list(list,2);
+
     for (int j = ny-1; j >= 0; j--) {
         progressIdx = float(ny-1-j)/(ny-1);
         for (int i = 0; i < nx; i++) {
             float u = float(i) / float(nx);
             float v = float(j) / float(ny);
             ray r(origin, lower_left_corner + u*horizontal + v*vertical);
-            vec3 col = color(r);
+
+            vec3 p = r.point_at_parameter(2.0);
+            vec3 col = color(r, world);
+
+            // vec3 col = color(r);
             int ir = int(255.99*col[0]);
             int ig = int(255.99*col[1]);
             int ib = int(255.99*col[2]);
