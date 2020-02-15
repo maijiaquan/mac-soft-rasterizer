@@ -724,6 +724,9 @@ float progressIdx = 0.0f, progressDir = 1.0f;
 class ray
 {
 public:
+    vec3 A; //起点
+    vec3 B; //方向
+
     ray() {}
     ray(const vec3 &a, const vec3 &b)
     {
@@ -734,15 +737,13 @@ public:
     vec3 direction() const { return B; }
     vec3 point_at_parameter(float t) const { return A + t * B; } //终点的坐标
 
-    vec3 A;
-    vec3 B;
 };
 
 struct hit_record
 {
-    float t;
-    vec3 p;
-    vec3 normal;
+    float t;   //命中射线的长度
+    vec3 p;    //命中终点坐标
+    vec3 normal; //命中点的法线
 };
 
 class hittable
@@ -821,12 +822,24 @@ public:
     }
 };
 
+vec3 random_in_unit_sphere()
+{
+    vec3 p;
+    do
+    {
+        p = 2.0 * vec3(random_double(), random_double(), random_double()) - vec3(1, 1, 1);
+    } while (p.squared_length() >= 1.0);
+    return p;
+}
+
 vec3 color(const ray &r, hittable *world)
 {
     hit_record rec;
-    if (world->hit(r, 0.0, MAXFLOAT, rec))
+    // if (world->hit(r, 0.0, MAXFLOAT, rec)) //射线命中物体
+    if (world->hit(r, 0.001, MAXFLOAT, rec)) //射线命中物体
     {
-        return 0.5 * vec3(rec.normal.x() + 1, rec.normal.y() + 1, rec.normal.z() + 1);
+        vec3 s_world = rec.p + rec.normal + random_in_unit_sphere();
+        return 0.5 * color(ray(rec.p, s_world - rec.p), world);
     }
     else
     {
@@ -854,11 +867,12 @@ public:
 
     ray get_ray(float u, float v)
     {
-        return ray(origin,
-                   lower_left_corner + u * horizontal + v * vertical - origin);
+        return ray(origin, lower_left_corner + u * horizontal + v * vertical - origin);
     }
 
 };
+
+
 #include <fstream>
 void RayTracing()
 {
@@ -870,8 +884,12 @@ void RayTracing()
                      // int ny = 300;
     int ns = 100;
 
-    int nx = 800;
-    int ny = 400;
+    int nx = 1200;
+    int ny = 600;
+    // int nx = 800;
+    // int ny = 400;
+    // int nx = 400;
+    // int ny = 200;
     // int nx = 200;
     // int ny = 100;
     std::cout << "P3\n"
@@ -888,7 +906,7 @@ void RayTracing()
     camera cam;
     ofstream outFile("output_" + to_string(nx) + "x" + to_string(ny) + ".ppm");
     outFile << "P3\n"
-        << nx << " " << ny << "\n255\n";
+            << nx << " " << ny << "\n255\n";
     for (int j = ny - 1; j >= 0; j--)
     {
         progressIdx = float(ny - 1 - j) / (ny - 1);
@@ -904,12 +922,14 @@ void RayTracing()
                 col += color(r, world);
             }
             col /= float(ns);
+            col = vec3( sqrt(col[0]), sqrt(col[1]), sqrt(col[2]) );
+
             int ir = int(255.99 * col[0]);
             int ig = int(255.99 * col[1]);
             int ib = int(255.99 * col[2]);
 
             device_pixel(framebuffer, i, ny - 1 - j, ir, ig, ib);
-            std::cout << ir << " " << ig << " " << ib << "\n";
+            // std::cout << ir << " " << ig << " " << ib << "\n";
             outFile << ir << " " << ig << " " << ib << endl;
             // outFile << icolor.r << " " << icolor.g << " " << icolor.b << endl;
         }
