@@ -706,10 +706,10 @@ void DrawDemo9_2()
 
 /*
 本次改动
-1.显示逻辑封装成camera
-2.增加random函数
-3.在一个像素里面重复随机采样100次，实现抗锯齿
-4.使用fstream导出图片成ppm格式
+1.增加材质抽象类 material
+2.增加兰伯特材质
+3.增加mental材质
+4.修改color函数
 */
 #include <unistd.h>
 #include "vec3.h"
@@ -718,6 +718,15 @@ inline double random_double() {
     return rand() / (RAND_MAX + 1.0);
 }
 
+vec3 random_in_unit_sphere()
+{
+    vec3 p;
+    do
+    {
+        p = 2.0 * vec3(random_double(), random_double(), random_double()) - vec3(1, 1, 1);
+    } while (p.squared_length() >= 1.0);
+    return p;
+}
 
 float progressIdx = 0.0f, progressDir = 1.0f;
 
@@ -738,28 +747,78 @@ public:
     vec3 point_at_parameter(float t) const { return A + t * B; } //终点的坐标
 
 };
+struct hit_record;
+
+//attenuation 衰减
+class material  {
+    public:
+        virtual bool scatter(const ray &r_in, const hit_record &rec, vec3 &attenuation, ray &scattered) const = 0;
+};
+
 
 struct hit_record
 {
     float t;   //命中射线的长度
     vec3 p;    //命中终点坐标
     vec3 normal; //命中点的法线
+    material *mat_ptr;
 };
+
+
+class lambertian : public material
+{
+public:
+    vec3 albedo; //反射率
+    lambertian(const vec3 &a) : albedo(a) {}
+    virtual bool scatter(const ray &r_in, const hit_record &rec, vec3 &attenuation, ray &scattered) const
+    {
+        vec3 s_world = rec.p + rec.normal + random_in_unit_sphere();
+        scattered = ray(rec.p, s_world - rec.p);
+        attenuation = albedo;
+        return true;
+    }
+
+};
+
+class metal : public material
+{
+public:
+    vec3 albedo;
+    float fuzz;
+
+    metal(const vec3 &a, float f) : albedo(a)
+    {
+        if (f < 1)
+            fuzz = f;
+        else
+            fuzz = 1;
+    }
+    virtual bool scatter(const ray &r_in, const hit_record &rec, vec3 &attenuation, ray &scattered) const
+    {
+        vec3 reflected = reflect(unit_vector(r_in.direction()), rec.normal);
+        // scattered = ray(rec.p, reflected);
+        scattered = ray(rec.p, reflected + fuzz * random_in_unit_sphere());
+        attenuation = albedo;
+        return (dot(scattered.direction(), rec.normal) > 0);
+    }
+};
+
+
 
 class hittable
 {
 public:
-    virtual bool hit(
-        const ray &r, float t_min, float t_max, hit_record &rec) const = 0;
+    virtual bool hit(const ray &r, float t_min, float t_max, hit_record &rec) const = 0;
 };
 
 class sphere : public hittable
 {
 public:
     sphere() {}
-    sphere(vec3 center, float r) : center(center), radius(r){};
+    sphere(vec3 cen, float r, material *m) : center(cen), radius(r), mat_ptr(m){};
     vec3 center;
     float radius;
+    material *mat_ptr; /* NEW */
 
     virtual bool hit(const ray &r, float t_min, float t_max, hit_record &rec) const
     {
@@ -776,6 +835,8 @@ public:
                 rec.t = temp;
                 rec.p = r.point_at_parameter(rec.t);
                 rec.normal = (rec.p - center) / radius;
+                rec.mat_ptr = mat_ptr; /* NEW */
+
                 return true;
             }
             temp = (-b + sqrt(discriminant)) / a; //大根
@@ -784,6 +845,8 @@ public:
                 rec.t = temp;
                 rec.p = r.point_at_parameter(rec.t);
                 rec.normal = (rec.p - center) / radius;
+                rec.mat_ptr = mat_ptr; /* NEW */
+
                 return true;
             }
         }
@@ -822,24 +885,21 @@ public:
     }
 };
 
-vec3 random_in_unit_sphere()
-{
-    vec3 p;
-    do
-    {
-        p = 2.0 * vec3(random_double(), random_double(), random_double()) - vec3(1, 1, 1);
-    } while (p.squared_length() >= 1.0);
-    return p;
-}
 
-vec3 color(const ray &r, hittable *world)
+
+vec3 color(const ray &r, hittable *world, int depth)
 {
     hit_record rec;
-    // if (world->hit(r, 0.0, MAXFLOAT, rec)) //射线命中物体
     if (world->hit(r, 0.001, MAXFLOAT, rec)) //射线命中物体
     {
-        vec3 s_world = rec.p + rec.normal + random_in_unit_sphere();
-        return 0.5 * color(ray(rec.p, s_world - rec.p), world);
+        ray scattered;
+        vec3 attenuation;
+        if (depth < 50 && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
+            return attenuation*color(scattered, world, depth+1);
+        }
+        else {
+            return vec3(0,0,0);
+        }
     }
     else
     {
@@ -894,15 +954,16 @@ void RayTracing()
     // int ny = 100;
     std::cout << "P3\n"
               << nx << " " << ny << "\n255\n";
-    vec3 lower_left_corner(-2.0, -1.0, -1.0);
-    vec3 horizontal(4.0, 0.0, 0.0);
-    vec3 vertical(0.0, 2.0, 0.0);
-    vec3 origin(0.0, 0.0, 0.0);
 
-    hittable *list[2];
-    list[0] = new sphere(vec3(0, 0, -1), 0.5);
-    list[1] = new sphere(vec3(0, -100.5, -1), 100);
-    hittable *world = new hittable_list(list, 2);
+    hittable *list[4];
+    list[0] = new sphere(vec3(0, 0, -1), 0.5, new lambertian(vec3(0.8, 0.3, 0.3)));
+    list[1] = new sphere(vec3(0, -100.5, -1), 100, new lambertian(vec3(0.8, 0.8, 0.0)));
+    // list[2] = new sphere(vec3(1, 0, -1), 0.5, new metal(vec3(0.8, 0.6, 0.2)));
+    list[2] = new sphere(vec3(1, 0, -1), 0.5, new metal(vec3(0.8, 0.6, 0.2), 0.3));
+    // list[3] = new sphere(vec3(-1, 0, -1), 0.5, new metal(vec3(0.8, 0.8, 0.8)));
+    list[3] = new sphere(vec3(-1, 0, -1), 0.5, new metal(vec3(0.8, 0.8, 0.8), 1.0));
+    hittable *world = new hittable_list(list, 4);
+
     camera cam;
     ofstream outFile("output_" + to_string(nx) + "x" + to_string(ny) + ".ppm");
     outFile << "P3\n"
@@ -919,7 +980,8 @@ void RayTracing()
                 float u = float(i + random_double()) / float(nx);
                 float v = float(j + random_double()) / float(ny);
                 ray r = cam.get_ray(u, v);
-                col += color(r, world);
+                col += color(r, world, 0);
+                // col += color(r, world);
             }
             col /= float(ns);
             col = vec3( sqrt(col[0]), sqrt(col[1]), sqrt(col[2]) );
