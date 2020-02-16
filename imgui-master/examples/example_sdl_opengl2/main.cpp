@@ -932,8 +932,56 @@ public:
 
 };
 
+void testThread(int i)
+{
+            // std::cout << "Hello from lamda thread " << std::this_thread::get_id() << std::endl;
+            cout<<"hello -- "<<i<<endl;
+}
+
+void foo(const int  &x,char *mychar)
+{
+	std::cout << &x << "   " << &mychar << std::endl;
+	std::cout << "正在运行的线程为：" << std::this_thread::get_id() << "线程的参数为： " << x <<"  "<<mychar<< std::endl;
+	return;
+}
 
 #include <fstream>
+#include <vector>
+#include <ctime>
+using namespace std;
+time_t curTime;
+float totTime;
+void RenderInThread(int numThread)
+{
+    // for (int j = (ny - 1) - i; j >= 0; j -= numThread)
+    // {
+    //     progressIdx = float(ny - 1 - j) / (ny - 1);
+    //     for (int i = 0; i < nx; i++)
+    //     {
+
+    //         vec3 col(0, 0, 0);
+    //         for (int s = 0; s < ns; s++)
+    //         {
+    //             float u = float(i + random_double()) / float(nx);
+    //             float v = float(j + random_double()) / float(ny);
+    //             ray r = cam.get_ray(u, v);
+    //             col += color(r, world, 0);
+    //             // col += color(r, world);
+    //         }
+    //         col /= float(ns);
+    //         col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
+
+    //         int ir = int(255.99 * col[0]);
+    //         int ig = int(255.99 * col[1]);
+    //         int ib = int(255.99 * col[2]);
+
+    //         device_pixel(framebuffer, i, ny - 1 - j, ir, ig, ib);
+    //         // std::cout << ir << " " << ig << " " << ib << "\n";
+    //         outFile << ir << " " << ig << " " << ib << endl;
+    //         // outFile << icolor.r << " " << icolor.g << " " << icolor.b << endl;
+    //     }
+    // }
+}
 void RayTracing()
 {
     usleep(1000);    // will sleep for 1 ms
@@ -964,43 +1012,92 @@ void RayTracing()
     list[3] = new sphere(vec3(-1, 0, -1), 0.5, new metal(vec3(0.8, 0.8, 0.8), 1.0));
     hittable *world = new hittable_list(list, 4);
 
-    camera cam;
+     camera cam;
     ofstream outFile("output_" + to_string(nx) + "x" + to_string(ny) + ".ppm");
-    outFile << "P3\n"
-            << nx << " " << ny << "\n255\n";
-    for (int j = ny - 1; j >= 0; j--)
+
+      vector<thread> threads;
+
+
+//     for (int i = 0; i < 5; ++i)
+//     {
+
+//                 threads.push_back(thread([i]() {
+
+//             cout << "Hello from lamda thread " <<i<< this_thread::get_id() << endl;
+
+//         }));
+
+//            
+//     }
+
+
+//         for (auto &thread : threads)
+//     {
+
+//                 thread.join();
+
+//            
+//     }
+
+    int num = 100;
+
+    int numThread = 4;
+    for (int k = 0; k < numThread; k++)
     {
-        progressIdx = float(ny - 1 - j) / (ny - 1);
-        for (int i = 0; i < nx; i++)
-        {
+        // threads.push_back(thread([=]() {
 
-            vec3 col(0, 0, 0);
-            for (int s = 0; s < ns; s++)
+            camera cam;
+//             cout << "Hello from lamda thread " <<i<< this_thread::get_id() << endl;
+             for (int j = (ny - 1) - k; j >= 0; j -= numThread)
             {
-                float u = float(i + random_double()) / float(nx);
-                float v = float(j + random_double()) / float(ny);
-                ray r = cam.get_ray(u, v);
-                col += color(r, world, 0);
-                // col += color(r, world);
+                progressIdx = float(ny - 1 - j) / (ny - 1);
+                for (int i = 0; i < nx; i++)
+                {
+
+                    vec3 col(0, 0, 0);
+                    for (int s = 0; s < ns; s++)
+                    {
+                        float u = float(i + random_double()) / float(nx);
+                        float v = float(j + random_double()) / float(ny);
+                        ray r = cam.get_ray(u, v);
+                        col += color(r, world, 0);
+                        // col += color(r, world);
+                    }
+                    col /= float(ns);
+                    col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
+
+                    int ir = int(255.99 * col[0]);
+                    int ig = int(255.99 * col[1]);
+                    int ib = int(255.99 * col[2]);
+
+                    device_pixel(framebuffer, i, ny - 1 - j, ir, ig, ib);
+                    // std::cout << ir << " " << ig << " " << ib << "\n";
+                    // outFile << ir << " " << ig << " " << ib << endl;
+                    // outFile << icolor.r << " " << icolor.g << " " << icolor.b << endl;
+        totTime = (float)((int)time(nullptr) - (int)curTime);
+                }
             }
-            col /= float(ns);
-            col = vec3( sqrt(col[0]), sqrt(col[1]), sqrt(col[2]) );
 
-            int ir = int(255.99 * col[0]);
-            int ig = int(255.99 * col[1]);
-            int ib = int(255.99 * col[2]);
-
-            device_pixel(framebuffer, i, ny - 1 - j, ir, ig, ib);
-            // std::cout << ir << " " << ig << " " << ib << "\n";
-            outFile << ir << " " << ig << " " << ib << endl;
-            // outFile << icolor.r << " " << icolor.g << " " << icolor.b << endl;
-        }
+//         }));
     }
-    return;
+
+            for (auto &thread : threads)
+    {
+
+                thread.join();
+
+           
+    }
+        cout << "totTime = " << time(nullptr) - curTime << endl;
+
+
+        return;
 }
 
 int main(int, char **)
 {
+    totTime = 0.0;
+       curTime = time(nullptr);
     // framebuffer = new int[display_w * display_h];
     framebuffer = new int[1280 * 720]; //todo
 
@@ -1137,6 +1234,7 @@ int main(int, char **)
             ImGui::ProgressBar(progressIdx, ImVec2(0.0f, 0.0f));
             ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
             ImGui::Text("Progress Bar");
+            ImGui::Text("Total time %.1f s", totTime);
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::End();
 
