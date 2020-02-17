@@ -731,7 +731,7 @@ vec3 random_in_unit_sphere()
     return p;
 }
 
-float progressIdx = 0.0f, progressDir = 1.0f;
+float progressDone = 0.0f, progressDir = 1.0f;
 
 class ray
 {
@@ -935,24 +935,12 @@ public:
 
 };
 
-void testThread(int i)
-{
-            // std::cout << "Hello from lamda thread " << std::this_thread::get_id() << std::endl;
-            cout<<"hello -- "<<i<<endl;
-}
-
-void foo(const int  &x,char *mychar)
-{
-	std::cout << &x << "   " << &mychar << std::endl;
-	std::cout << "正在运行的线程为：" << std::this_thread::get_id() << "线程的参数为： " << x <<"  "<<mychar<< std::endl;
-	return;
-}
 
 void Framebuffer2File(int nx, int ny, int ns, int *fb, ofstream &outFile)
 {
     for (int j = (ny - 1) ; j >= 0; j --)
     {
-        progressIdx = float(ny - 1 - j) / (ny - 1);
+        progressDone = float(ny - 1 - j) / (ny - 1);
         for (int i = 0; i < nx; i++)
         {
             // device_pixel(framebuffer, i, ny - 1 - j, ir, ig, ib);
@@ -976,6 +964,7 @@ void Framebuffer2File(int nx, int ny, int ns, int *fb, ofstream &outFile)
 using namespace std;
 time_t curTime;
 float totTime;
+float timeRemaining;
 
 int nx, ny, ns;
 
@@ -1021,25 +1010,60 @@ void RayTracing()
 
 
 /*
-todo
+
+done
 输出到ppm文件
+进度条除颤
+剩余时间（不精确）
+
+todo
+剩余时间
 精确到微秒
 换种方式多线程
-进度条除颤
+
 */
     int num = 100;
 
-    int numThread = 300;
+    int numThread = 20;
+    int numPixelRendered = 0;
+    int doneRecord = 0;
+    int lastTime = -1;
     for (int k = 0; k < numThread; k++)
     {
-        threads.push_back(thread([=]() {
+        threads.push_back(thread([=, &numPixelRendered, &lastTime, &doneRecord]() {
 
             camera cam;
+            int numPixelTotal = nx * ny;
             for (int j = (ny - 1) - k; j >= 0; j -= numThread)
             {
-                progressIdx = float(ny - 1 - j) / (ny - 1);
+                progressDone = float(numPixelRendered) / (numPixelTotal);
+                // cout<<"progress Done = "<<progressDone<<endl;
+                totTime = (float)((int)time(nullptr) - (int)curTime);
+                if(lastTime < 0)
+                {
+                    lastTime = totTime;
+                    doneRecord = numPixelRendered;
+                }
+                else
+                {
+                    if(totTime - lastTime >= 1.0)
+                    {
+                        int pixelPerSecond = numPixelRendered - doneRecord;
+                        cout<<"pixelPerSecond = "<<pixelPerSecond<<endl;
+
+                        timeRemaining = (float) (numPixelTotal - numPixelRendered) / pixelPerSecond;
+                        lastTime = totTime;
+                        doneRecord = numPixelRendered;
+                    }
+                }
+
+                // timeRemaining = (float)totTime * (1 - progressDone) / progressDone;
+
+                // cout<<"timeRemaining = "<<timeRemaining<<endl;
                 for (int i = 0; i < nx; i++)
                 {
+                    // usleep(1000); // will sleep for 1 ms
+                    numPixelRendered++;
 
                     vec3 col(0, 0, 0);
                     for (int s = 0; s < ns; s++)
@@ -1061,7 +1085,6 @@ todo
                     // std::cout << ir << " " << ig << " " << ib << "\n";
                     // outFile << ir << " " << ig << " " << ib << endl;
                     // outFile << icolor.r << " " << icolor.g << " " << icolor.b << endl;
-        totTime = (float)((int)time(nullptr) - (int)curTime);
                 }
             }
 
@@ -1204,24 +1227,27 @@ int main(int, char **)
                     // Animate a simple progress bar
             // if (true)
             // {
-            //     progressIdx += progressDir * 0.4f * ImGui::GetIO().DeltaTime;
-            //     if (progressIdx >= +1.1f)
+            //     progressDone += progressDir * 0.4f * ImGui::GetIO().DeltaTime;
+            //     if (progressDone >= +1.1f)
             //     {
-            //         progressIdx = +1.1f;
+            //         progressDone = +1.1f;
             //         progressDir *= -1.0f;
             //     }
-            //     if (progressIdx <= -0.1f)
+            //     if (progressDone <= -0.1f)
             //     {
-            //         progressIdx = -0.1f;
+            //         progressDone = -0.1f;
             //         progressDir *= -1.0f;
             //     }
             // }
 
             // Typically we would use ImVec2(-1.0f,0.0f) to use all available width, or ImVec2(width,0.0f) for a specified width. ImVec2(0.0f,0.0f) uses ItemWidth.
-            ImGui::ProgressBar(progressIdx, ImVec2(0.0f, 0.0f));
+            ImGui::ProgressBar(progressDone, ImVec2(0.0f, 0.0f));
             ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
             ImGui::Text("Progress Bar");
             ImGui::Text("Total time %.1f s", totTime);
+            ImGui::Text("timeRemaining time %.1f s", timeRemaining);
+              
+
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::End();
 
