@@ -26,6 +26,9 @@
 // #include "material.h"
 // #include "random.h"
 #include <thread>
+#include <fstream>
+#include <vector>
+#include <ctime>
 //全局变量
 enum RenderType
 {
@@ -945,61 +948,58 @@ void foo(const int  &x,char *mychar)
 	return;
 }
 
-#include <fstream>
-#include <vector>
-#include <ctime>
+void Framebuffer2File(int nx, int ny, int ns, int *fb, ofstream &outFile)
+{
+    for (int j = (ny - 1) ; j >= 0; j --)
+    {
+        progressIdx = float(ny - 1 - j) / (ny - 1);
+        for (int i = 0; i < nx; i++)
+        {
+            // device_pixel(framebuffer, i, ny - 1 - j, ir, ig, ib);
+            // device_pixel(fb, x, y, c);
+            int x = i;
+            int y = ny - 1 - j;
+            int c = fb[y * display_w + x];
+            int r,g,b = 0;
+
+            Color2RGB(c, r, g, b);
+
+            // std::cout << r << " " << g << " " << b << "\n";
+            outFile << r << " " << g << " " << b << endl;
+            // outFile << icolor.r << " " << icolor.g << " " << icolor.b << endl;
+            // totTime = (float)((int)time(nullptr) - (int)curTime);
+        }
+    }
+}
+
+
 using namespace std;
 time_t curTime;
 float totTime;
-void RenderInThread(int numThread)
-{
-    // for (int j = (ny - 1) - i; j >= 0; j -= numThread)
-    // {
-    //     progressIdx = float(ny - 1 - j) / (ny - 1);
-    //     for (int i = 0; i < nx; i++)
-    //     {
 
-    //         vec3 col(0, 0, 0);
-    //         for (int s = 0; s < ns; s++)
-    //         {
-    //             float u = float(i + random_double()) / float(nx);
-    //             float v = float(j + random_double()) / float(ny);
-    //             ray r = cam.get_ray(u, v);
-    //             col += color(r, world, 0);
-    //             // col += color(r, world);
-    //         }
-    //         col /= float(ns);
-    //         col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
+int nx, ny, ns;
 
-    //         int ir = int(255.99 * col[0]);
-    //         int ig = int(255.99 * col[1]);
-    //         int ib = int(255.99 * col[2]);
-
-    //         device_pixel(framebuffer, i, ny - 1 - j, ir, ig, ib);
-    //         // std::cout << ir << " " << ig << " " << ib << "\n";
-    //         outFile << ir << " " << ig << " " << ib << endl;
-    //         // outFile << icolor.r << " " << icolor.g << " " << icolor.b << endl;
-    //     }
-    // }
-}
 void RayTracing()
 {
+
+    ns = 100;
+
+    nx = 1200;
+    ny = 600;
+    // nx = 800;
+    // ny = 400;
+    // nx = 400;
+    // ny = 200;
+    // nx = 200;
+    // ny = 100;
     usleep(1000);    // will sleep for 1 ms
     usleep(1);       // will sleep for 0.001 ms
+    usleep(1000000); // will sleep for 1 s
     usleep(1000000); // will sleep for 1 s
                      // usleep(1000000); // will sleep for 1 s
                      // int nx = 600;
                      // int ny = 300;
-    int ns = 100;
 
-    int nx = 1200;
-    int ny = 600;
-    // int nx = 800;
-    // int ny = 400;
-    // int nx = 400;
-    // int ny = 200;
-    // int nx = 200;
-    // int ny = 100;
     std::cout << "P3\n"
               << nx << " " << ny << "\n255\n";
 
@@ -1014,41 +1014,28 @@ void RayTracing()
 
      camera cam;
     ofstream outFile("output_" + to_string(nx) + "x" + to_string(ny) + ".ppm");
-
+    outFile << "P3\n"
+            << nx << " " << ny << "\n255\n";
       vector<thread> threads;
 
 
-//     for (int i = 0; i < 5; ++i)
-//     {
 
-//                 threads.push_back(thread([i]() {
-
-//             cout << "Hello from lamda thread " <<i<< this_thread::get_id() << endl;
-
-//         }));
-
-//            
-//     }
-
-
-//         for (auto &thread : threads)
-//     {
-
-//                 thread.join();
-
-//            
-//     }
-
+/*
+todo
+输出到ppm文件
+精确到微秒
+换种方式多线程
+进度条除颤
+*/
     int num = 100;
 
-    int numThread = 4;
+    int numThread = 300;
     for (int k = 0; k < numThread; k++)
     {
-        // threads.push_back(thread([=]() {
+        threads.push_back(thread([=]() {
 
             camera cam;
-//             cout << "Hello from lamda thread " <<i<< this_thread::get_id() << endl;
-             for (int j = (ny - 1) - k; j >= 0; j -= numThread)
+            for (int j = (ny - 1) - k; j >= 0; j -= numThread)
             {
                 progressIdx = float(ny - 1 - j) / (ny - 1);
                 for (int i = 0; i < nx; i++)
@@ -1078,7 +1065,7 @@ void RayTracing()
                 }
             }
 
-//         }));
+        }));
     }
 
             for (auto &thread : threads)
@@ -1089,7 +1076,7 @@ void RayTracing()
            
     }
         cout << "totTime = " << time(nullptr) - curTime << endl;
-
+        Framebuffer2File(nx, ny, ns, framebuffer, outFile);
 
         return;
 }
