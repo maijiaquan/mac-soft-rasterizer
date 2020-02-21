@@ -752,9 +752,9 @@ public:
 };
 struct hit_record;
 
-//attenuation 衰减
 class material  {
     public:
+        //r_in为入射光线, scattered为散射光线, attenuation 为衰减量
         virtual bool scatter(const ray &r_in, const hit_record &rec, vec3 &attenuation, ray &scattered) const = 0;
 };
 
@@ -763,7 +763,7 @@ struct hit_record
 {
     float t;   //命中射线的长度
     vec3 p;    //命中终点坐标
-    vec3 normal; //命中点的法线
+    vec3 normal; //命中点的法向量
     material *mat_ptr;
 };
 
@@ -776,7 +776,7 @@ public:
     virtual bool scatter(const ray &r_in, const hit_record &rec, vec3 &attenuation, ray &scattered) const
     {
         vec3 s_world = rec.p + rec.normal + random_in_unit_sphere();
-        scattered = ray(rec.p, s_world - rec.p);
+        scattered = ray(rec.p, s_world - rec.p); //scattered为散射光线
         attenuation = albedo;
         return true;
     }
@@ -798,9 +798,13 @@ public:
     }
     virtual bool scatter(const ray &r_in, const hit_record &rec, vec3 &attenuation, ray &scattered) const
     {
-        vec3 reflected = reflect(unit_vector(r_in.direction()), rec.normal);
-        // scattered = ray(rec.p, reflected);
-        scattered = ray(rec.p, reflected + fuzz * random_in_unit_sphere());
+        vec3 v = unit_vector(r_in.direction());
+        vec3 n = rec.normal;
+        vec3 p = rec.p;
+        vec3 r = reflect(v, n);
+        vec3 offset = fuzz * random_in_unit_sphere();
+        scattered = ray(p, r+offset);
+
         attenuation = albedo;
         return (dot(scattered.direction(), rec.normal) > 0);
     }
@@ -823,6 +827,7 @@ public:
     float radius;
     material *mat_ptr; /* NEW */
 
+    //如果命中了，命中记录保存到rec
     virtual bool hit(const ray &r, float t_min, float t_max, hit_record &rec) const
     {
         vec3 oc = r.origin() - center;
@@ -869,9 +874,9 @@ public:
         list = l;
         list_size = n;
     }
-    virtual bool hit(const ray &r, float t_min, float t_max, hit_record &rec) const
+    //如果命中了，命中记录保存到rec
+    virtual bool hit(const ray &r, float t_min, float t_max, hit_record &rec) const 
     {
-
         hit_record temp_rec;
         bool hit_anything = false;
         double closest_so_far = t_max;
@@ -889,7 +894,7 @@ public:
 };
 
 
-
+//在场景中发射一条射线，并采样该射线最终输出到屏幕的颜色值
 vec3 color(const ray &r, hittable *world, int depth)
 {
     hit_record rec;
@@ -967,18 +972,30 @@ float totTime;
 float timeRemaining;
 
 int nx, ny, ns;
+    /*
 
+done
+输出到ppm文件
+进度条除颤
+剩余时间（不精确）
+
+todo
+剩余时间
+精确到微秒
+换种方式多线程
+
+*/
 void RayTracing()
 {
 
     ns = 100;
 
-    nx = 1200;
-    ny = 600;
+    // nx = 1200;
+    // ny = 600;
     // nx = 800;
     // ny = 400;
-    // nx = 400;
-    // ny = 200;
+    nx = 400;
+    ny = 200;
     // nx = 200;
     // ny = 100;
     usleep(1000);    // will sleep for 1 ms
@@ -994,34 +1011,18 @@ void RayTracing()
 
     hittable *list[4];
     list[0] = new sphere(vec3(0, 0, -1), 0.5, new lambertian(vec3(0.8, 0.3, 0.3)));
-    list[1] = new sphere(vec3(0, -100.5, -1), 100, new lambertian(vec3(0.8, 0.8, 0.0)));
-    // list[2] = new sphere(vec3(1, 0, -1), 0.5, new metal(vec3(0.8, 0.6, 0.2)));
+    list[1] = new sphere(vec3(0,-100.5,-1), 100, new lambertian(vec3(0.8, 0.8, 0.0)));
     list[2] = new sphere(vec3(1, 0, -1), 0.5, new metal(vec3(0.8, 0.6, 0.2), 0.3));
-    // list[3] = new sphere(vec3(-1, 0, -1), 0.5, new metal(vec3(0.8, 0.8, 0.8)));
     list[3] = new sphere(vec3(-1, 0, -1), 0.5, new metal(vec3(0.8, 0.8, 0.8), 1.0));
     hittable *world = new hittable_list(list, 4);
 
-     camera cam;
+    camera cam;
     ofstream outFile("output_" + to_string(nx) + "x" + to_string(ny) + ".ppm");
     outFile << "P3\n"
             << nx << " " << ny << "\n255\n";
-      vector<thread> threads;
+    vector<thread> threads;
 
 
-
-/*
-
-done
-输出到ppm文件
-进度条除颤
-剩余时间（不精确）
-
-todo
-剩余时间
-精确到微秒
-换种方式多线程
-
-*/
     int num = 100;
 
     int numThread = 20;
@@ -1051,13 +1052,13 @@ todo
                         int pixelPerSecond = numPixelRendered - doneRecord;
                         cout<<"pixelPerSecond = "<<pixelPerSecond<<endl;
 
-                        timeRemaining = (float) (numPixelTotal - numPixelRendered) / pixelPerSecond;
+                        timeRemaining = (float) (numPixelTotal - numPixelRendered) / pixelPerSecond; //法一：根据当前的瞬时速度来更新显示
                         lastTime = totTime;
                         doneRecord = numPixelRendered;
                     }
                 }
 
-                // timeRemaining = (float)totTime * (1 - progressDone) / progressDone;
+                // timeRemaining = (float)totTime * (1 - progressDone) / progressDone; //法二：根据过去的平均时间来显示 x/t=pTodo/pDone -> x= t*pTodo/pDone = t*(1-pDone) /pDone
 
                 // cout<<"timeRemaining = "<<timeRemaining<<endl;
                 for (int i = 0; i < nx; i++)
@@ -1091,17 +1092,14 @@ todo
         }));
     }
 
-            for (auto &thread : threads)
+    for (auto &thread : threads)
     {
-
-                thread.join();
-
-           
+        thread.join();
     }
-        cout << "totTime = " << time(nullptr) - curTime << endl;
-        Framebuffer2File(nx, ny, ns, framebuffer, outFile);
+    cout << "totTime = " << time(nullptr) - curTime << endl;
+    Framebuffer2File(nx, ny, ns, framebuffer, outFile);
 
-        return;
+    return;
 }
 
 int main(int, char **)
