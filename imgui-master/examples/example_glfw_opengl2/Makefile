@@ -54,13 +54,13 @@ endif
 
 
 %.o:%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) -std=c++11 $(CXXFLAGS) -c -o $@ $<
 
 %.o:../%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) -std=c++11 $(CXXFLAGS) -c -o $@ $<
 
 %.o:../../%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) -std=c++11 $(CXXFLAGS) -c -o $@ $<
 
 all: $(EXE)
 	@echo Build complete for $(ECHO_MESSAGE)
